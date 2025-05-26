@@ -1,0 +1,111 @@
+@using marketimnet.Core.ViewModels
+@model OrderViewModel
+@{
+    ViewData["Title"] = "Sipariş Tamamla";
+}
+
+<div class="container mt-4">
+    <h2>Sipariş Onayı</h2>
+    <div class="row">
+        <div class="col-md-8">
+            <form asp-action="Checkout" method="post">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Teslimat Bilgileri</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label asp-for="ShippingAddress" class="form-label"></label>
+                            <textarea asp-for="ShippingAddress" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="ShippingAddress" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Notes" class="form-label"></label>
+                            <textarea asp-for="Notes" class="form-control" rows="2"></textarea>
+                            <span asp-validation-for="Notes" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Ödeme Bilgileri</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label asp-for="CardHolderName" class="form-label"></label>
+                            <input asp-for="CardHolderName" class="form-control" />
+                            <span asp-validation-for="CardHolderName" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="CardNumber" class="form-label"></label>
+                            <input asp-for="CardNumber" class="form-control" id="cardNumber" />
+                            <span asp-validation-for="CardNumber" class="text-danger"></span>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ExpiryDate" class="form-label"></label>
+                                <input asp-for="ExpiryDate" class="form-control" placeholder="AA/YY" />
+                                <span asp-validation-for="ExpiryDate" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Cvc" class="form-label"></label>
+                                <input asp-for="Cvc" class="form-control" maxlength="3" />
+                                <span asp-validation-for="Cvc" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg w-100">Siparişi Onayla</button>
+            </form>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Sipariş Özeti</h5>
+                </div>
+                <div class="card-body">
+                    @foreach (var item in Model.CartItems)
+                    {
+                        <div class="d-flex justify-content-between mb-2">
+                            <div>
+                                <h6 class="mb-0">@item.ProductName</h6>
+                                <small class="text-muted">@item.Quantity adet x @item.Price.ToString("C2")</small>
+                            </div>
+                            <div>
+                                <strong>@((item.Quantity * item.Price).ToString("C2"))</strong>
+                            </div>
+                        </div>
+                    }
+                    <hr />
+                    <div class="d-flex justify-content-between">
+                        <h5>Toplam:</h5>
+                        <h5>@Model.TotalAmount.ToString("C2")</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Kart numarası formatlaması
+        document.getElementById('cardNumber').addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, '');
+            value = value.replace(/(.{4})/g, '$1 ').trim();
+            e.target.value = value;
+        });
+
+        // Son kullanma tarihi formatlaması
+        document.querySelector('[name="ExpiryDate"]').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            }
+            e.target.value = value;
+        });
+    </script>
+} 

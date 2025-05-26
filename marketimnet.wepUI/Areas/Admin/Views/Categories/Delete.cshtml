@@ -1,0 +1,45 @@
+@model marketimnet.Core.Entities.Category
+@{
+    ViewData["Title"] = "Kategori Sil";
+}
+
+<div class="container-fluid">
+    <h1 class="h3 mb-2 text-gray-800">@ViewData["Title"]</h1>
+    <p class="mb-4">Bu kategoriyi silmek istediğinize emin misiniz?</p>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Kategori Bilgileri</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <dl class="row">
+                        <dt class="col-sm-3">Kategori Adı</dt>
+                        <dd class="col-sm-9">@Model.Name</dd>
+
+                        <dt class="col-sm-3">Durum</dt>
+                        <dd class="col-sm-9">
+                            @if (Model.IsActive)
+                            {
+                                <span class="badge badge-success">Aktif</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-danger">Pasif</span>
+                            }
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+
+            <form asp-action="Delete" method="post" class="mt-4">
+                <input type="hidden" asp-for="Id" />
+                <a asp-action="Index" class="btn btn-secondary">İptal</a>
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash-alt mr-1"></i> Sil
+                </button>
+            </form>
+        </div>
+    </div>
+</div> 

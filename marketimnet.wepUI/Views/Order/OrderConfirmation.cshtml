@@ -1,0 +1,104 @@
+@model Order
+
+@{
+    ViewData["Title"] = "Sipariş Onayı";
+}
+
+<!-- Toastr CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet" />
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">Sipariş Onayı</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-success">
+                        <h5>Siparişiniz başarıyla alındı!</h5>
+                        <p>Sipariş numaranız: <strong>@Model.OrderNumber</strong></p>
+                    </div>
+
+                    <h5 class="mt-4">Sipariş Detayları</h5>
+                    <hr />
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Ad Soyad:</strong> @Model.FullName</p>
+                            <p><strong>E-posta:</strong> @Model.Email</p>
+                            <p><strong>Telefon:</strong> @Model.Phone</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Sipariş Tarihi:</strong> @Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</p>
+                            <p><strong>Durum:</strong> @Model.Status</p>
+                            <p><strong>Teslimat Adresi:</strong> @Model.Address</p>
+                        </div>
+                    </div>
+
+                    <h5 class="mt-4">Sipariş Özeti</h5>
+                    <hr />
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Ürün</th>
+                                    <th>Adet</th>
+                                    <th>Birim Fiyat</th>
+                                    <th>Toplam</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.OrderItems)
+                                {
+                                    <tr>
+                                        <td>@item.Product.Name</td>
+                                        <td>@item.Quantity</td>
+                                        <td>@item.UnitPrice.ToString("C2")</td>
+                                        <td>@item.TotalPrice.ToString("C2")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>Toplam:</strong></td>
+                                    <td><strong>@Model.TotalAmount.ToString("C2")</strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <a href="@Url.Action("Index", "Home")" class="btn btn-primary">
+                            <i class="fas fa-home"></i> Anasayfaya Dön
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Toastr JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            // Configure toastr
+            toastr.options = {
+                "closeButton": true,
+                "progressBar": true,
+                "positionClass": "toast-top-right",
+                "timeOut": "5000"
+            };
+            
+            // Show toastr message if exists
+            @if (TempData["ToastrMessage"] != null)
+            {
+                <text>
+                toastr['@TempData["ToastrType"]']('@TempData["ToastrMessage"]');
+                </text>
+            }
+        });
+    </script>
+} 

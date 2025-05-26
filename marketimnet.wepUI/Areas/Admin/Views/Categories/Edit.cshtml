@@ -1,0 +1,92 @@
+@model marketimnet.wepUI.Areas.Admin.Models.CategoryViewModel
+
+@{
+    ViewData["Title"] = "Kategori Düzenle";
+}
+
+<div class="container-fluid">
+    <h1 class="h3 mb-2 text-gray-800">@ViewData["Title"]</h1>
+    <p class="mb-4">Kategori bilgilerini düzenleyin.</p>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Kategori Bilgileri</h6>
+        </div>
+        <div class="card-body">
+            <form asp-action="Edit" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="Image" />
+                
+                <div class="form-group">
+                    <label asp-for="Name" class="control-label"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Description" class="control-label"></label>
+                    <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="ParentId" class="control-label"></label>
+                    <select asp-for="ParentId" class="form-control" asp-items="ViewBag.ParentCategories">
+                        <option value="">-- Üst Kategori Seçin --</option>
+                    </select>
+                    <span asp-validation-for="ParentId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="OrderNo" class="control-label"></label>
+                    <input asp-for="OrderNo" class="form-control" type="number" />
+                    <span asp-validation-for="OrderNo" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label">Mevcut Resim</label>
+                    @if (!string.IsNullOrEmpty(Model.Image))
+                    {
+                        <div class="mb-2">
+                            <img src="@Model.Image" alt="@Model.Name" class="img-thumbnail" style="max-width: 200px;" />
+                        </div>
+                    }
+                    <div class="custom-file">
+                        <input asp-for="ImageFile" type="file" class="custom-file-input" id="customFile">
+                        <label class="custom-file-label" for="customFile">Yeni resim seçin (opsiyonel)</label>
+                    </div>
+                    <small class="form-text text-muted">Yeni bir resim seçerseniz mevcut resim değiştirilecektir.</small>
+                </div>
+
+                <div class="form-group form-check">
+                    <label class="form-check-label">
+                        <input class="form-check-input" asp-for="IsActive" /> @Html.DisplayNameFor(model => model.IsActive)
+                    </label>
+                </div>
+
+                <div class="form-group form-check">
+                    <label class="form-check-label">
+                        <input class="form-check-input" asp-for="IsTopMenu" /> @Html.DisplayNameFor(model => model.IsTopMenu)
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <a asp-action="Index" class="btn btn-secondary">İptal</a>
+                    <input type="submit" value="Kaydet" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        // Dosya seçildiğinde dosya adını göster
+        $('.custom-file-input').on('change', function () {
+            var fileName = $(this).val().split('\\').pop();
+            $(this).next('.custom-file-label').html(fileName);
+        });
+    </script>
+} 

@@ -1,0 +1,78 @@
+﻿<!-- Sidebar -->
+<ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+    <!-- Sidebar - Brand -->
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" asp-area="Admin" asp-controller="Main" asp-action="Index">
+        <div class="sidebar-brand-icon rotate-n-15">
+            <i class="fas fa-shopping-cart"></i>
+        </div>
+        <div class="sidebar-brand-text mx-3">Marketim.Net</div>
+    </a>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider my-0">
+
+    <!-- Nav Item - Dashboard -->
+    <li class="nav-item">
+        <a class="nav-link" asp-area="Admin" asp-controller="Main" asp-action="Index">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Dashboard</span>
+        </a>
+    </li>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider">
+
+    <!-- Heading -->
+    <div class="sidebar-heading">
+        Yönetim
+    </div>
+
+    <!-- Nav Item - Categories -->
+    <li class="nav-item">
+        <a class="nav-link" asp-area="Admin" asp-controller="Categories" asp-action="Index">
+            <i class="fas fa-fw fa-folder"></i>
+            <span>Kategoriler</span>
+        </a>
+    </li>
+
+    <!-- Nav Item - Products -->
+    <li class="nav-item">
+        <a class="nav-link" asp-area="Admin" asp-controller="Products" asp-action="Index">
+            <i class="fas fa-fw fa-box"></i>
+            <span>Ürünler</span>
+        </a>
+    </li>
+
+    <!-- Nav Item - Markalar -->
+    <li class="nav-item">
+        <a class="nav-link" asp-area="Admin" asp-controller="Brands" asp-action="Index">
+            <i class="fas fa-fw fa-trademark"></i>
+            <span>Markalar</span>
+        </a>
+    </li>
+
+    <!-- Nav Item - Siparişler -->
+    <li class="nav-item">
+        <a class="nav-link" asp-area="Admin" asp-controller="Orders" asp-action="Index">
+            <i class="fas fa-fw fa-shopping-cart"></i>
+            <span>Siparişler</span>
+        </a>
+    </li>
+
+    <!-- Nav Item - Kullanıcılar -->
+    <li class="nav-item">
+        <a class="nav-link" asp-area="Admin" asp-controller="Users" asp-action="Index">
+            <i class="fas fa-fw fa-users"></i>
+            <span>Kullanıcılar</span>
+        </a>
+    </li>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider d-none d-md-block">
+
+    <!-- Sidebar Toggler (Sidebar) -->
+    <div class="text-center d-none d-md-inline">
+        <button class="rounded-circle border-0" id="sidebarToggle"></button>
+    </div>
+</ul>
+<!-- End of Sidebar -->

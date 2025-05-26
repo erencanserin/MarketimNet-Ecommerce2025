@@ -1,0 +1,133 @@
+@model IEnumerable<marketimnet.Core.Entities.Category>
+
+@{
+    ViewData["Title"] = "Kategoriler";
+}
+
+<div class="container-fluid">
+    <h1 class="h3 mb-2 text-gray-800">@ViewData["Title"]</h1>
+    <p class="mb-4">Kategori listesi ve yönetimi</p>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary">Kategori Listesi</h6>
+                <a asp-action="Create" class="btn btn-primary btn-sm" id="createCategoryBtn">
+                    <i class="fas fa-plus"></i> Yeni Kategori
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="categoriesTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Resim</th>
+                            <th>Kategori Adı</th>
+                            <th>Üst Kategori</th>
+                            <th>Sıra No</th>
+                            <th>Durum</th>
+                            <th>Üst Menü</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            var table = $('#categoriesTable').DataTable({
+                "processing": true,
+                "serverSide": false,
+                "ajax": {
+                    "url": "@Url.Action("GetCategories", "Categories", new { area = "Admin" })",
+                    "type": "GET",
+                    "datatype": "json",
+                    "dataSrc": function (json) {
+                        if (json.error) {
+                            console.error('Veri yükleme hatası:', json.error);
+                            return [];
+                        }
+                        return json.data || [];
+                    },
+                    "error": function (xhr, error, thrown) {
+                        console.error('DataTables AJAX hatası:', error);
+                        alert('Kategoriler yüklenirken bir hata oluştu. Lütfen sayfayı yenileyin.');
+                    }
+                },
+                "columns": [
+                    { "data": "id" },
+                    {
+                        "data": "image",
+                        "render": function (data, type, row) {
+                            if (data) {
+                                return '<img src="' + data + '" alt="' + row.name + '" style="height: 50px;" class="img-thumbnail" />';
+                            }
+                            return '<span class="text-muted">Resim yok</span>';
+                        }
+                    },
+                    { "data": "name" },
+                    {
+                        "data": "parent",
+                        "render": function (data) {
+                            return data ? data.name : '<span class="text-muted">-</span>';
+                        }
+                    },
+                    { "data": "orderNo" },
+                    {
+                        "data": "isActive",
+                        "render": function (data) {
+                            return data
+                                ? '<span class="badge badge-success">Aktif</span>'
+                                : '<span class="badge badge-danger">Pasif</span>';
+                        }
+                    },
+                    {
+                        "data": "isTopMenu",
+                        "render": function (data) {
+                            return data
+                                ? '<span class="badge badge-info">Evet</span>'
+                                : '<span class="badge badge-secondary">Hayır</span>';
+                        }
+                    },
+                    {
+                        "data": "id",
+                        "render": function (data) {
+                            return '<div class="btn-group">' +
+                                '<a href="/Admin/Categories/Edit/' + data + '" class="btn btn-primary btn-sm"><i class="fas fa-edit"></i></a> ' +
+                                '<a href="/Admin/Categories/Delete/' + data + '" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></a>' +
+                                '</div>';
+                        }
+                    }
+                ],
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Turkish.json"
+                },
+                "order": [[0, "desc"]],
+                "pageLength": 25,
+                "responsive": true,
+                "drawCallback": function(settings) {
+                    console.log('Tablo güncellendi:', settings);
+                }
+            });
+
+            // Her 10 saniyede bir tabloyu güncelle
+            setInterval(function () {
+                table.ajax.reload(null, false);
+            }, 10000);
+
+            // Form submit olduğunda tabloyu güncelle
+            $('form').on('submit', function() {
+                setTimeout(function() {
+                    table.ajax.reload();
+                }, 500);
+            });
+        });
+    </script>
+} 

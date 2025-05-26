@@ -1,0 +1,162 @@
+@model marketimnet.wepUI.Areas.Admin.Models.ProductViewModel
+
+@{
+    ViewData["Title"] = "Yeni Ürün Ekle";
+}
+
+<div class="container-fluid">
+    <h1 class="h3 mb-2 text-gray-800">@ViewData["Title"]</h1>
+    <p class="mb-4">Mağazanıza yeni bir ürün ekleyin.</p>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Ürün Bilgileri</h6>
+        </div>
+        <div class="card-body">
+            <form asp-action="Create" enctype="multipart/form-data" id="createProductForm">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                
+                <div class="form-group">
+                    <label asp-for="Name" class="control-label"></label>
+                    <input asp-for="Name" class="form-control" required />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Description" class="control-label"></label>
+                    <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Price" class="control-label"></label>
+                    <input asp-for="Price" class="form-control" required min="0.01" step="0.01" />
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="DiscountedPrice" class="control-label"></label>
+                    <input asp-for="DiscountedPrice" class="form-control" />
+                    <span asp-validation-for="DiscountedPrice" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="ProductCode" class="control-label"></label>
+                    <input asp-for="ProductCode" class="form-control" required />
+                    <span asp-validation-for="ProductCode" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="CategoryId" class="control-label"></label>
+                    <select asp-for="CategoryId" asp-items="Model.Categories" class="form-control">
+                        <option value="">-- Kategori Seçin --</option>
+                    </select>
+                    <span asp-validation-for="CategoryId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Image" class="control-label"></label>
+                    <input asp-for="Image" type="file" class="form-control" accept="image/*" />
+                    <span asp-validation-for="Image" class="text-danger"></span>
+                </div>
+
+                <div class="form-group form-check">
+                    <label class="form-check-label">
+                        <input class="form-check-input" asp-for="IsActive" /> @Html.DisplayNameFor(model => model.IsActive)
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <a asp-action="Index" class="btn btn-secondary">İptal</a>
+                    <input type="submit" value="Kaydet" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function () {
+            // Dosya seçildiğinde dosya adını göster
+            $('.custom-file-input').on('change', function () {
+                var fileName = $(this).val().split('\\').pop();
+                $(this).next('.custom-file-label').html(fileName);
+            });
+
+            // Form gönderiminden önce validasyon kontrolü
+            $('#createProductForm').on('submit', function (e) {
+                // Form validasyonunu client side olarak kontrol et
+                if (!$(this)[0].checkValidity()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    $(this).addClass('was-validated');
+                    return false;
+                }
+                
+                e.preventDefault();
+                var formData = new FormData(this);
+
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    beforeSend: function() {
+                        // Gönderim başlamadan önce butonları devre dışı bırak
+                        $('button[type="submit"]').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Kaydediliyor...');
+                    },
+                    success: function (response) {
+                        if (response && response.success) {
+                            // Başarılı ekleme
+                            toastr.success('Ürün başarıyla eklendi');
+                            setTimeout(function() {
+                                window.location.href = '@Url.Action("Index", "Products", new { area = "Admin" })';
+                            }, 1500);
+                        } else {
+                            // Genel hata
+                            toastr.error('Ürün eklenirken bir hata oluştu');
+                            $('button[type="submit"]').prop('disabled', false).text('Kaydet');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        // Hata durumu
+                        $('button[type="submit"]').prop('disabled', false).text('Kaydet');
+                        
+                        // ModelState hataları geldi mi kontrol et
+                        if (xhr.responseJSON) {
+                            var errors = xhr.responseJSON;
+                            var errorMessage = '';
+                            
+                            $.each(errors, function(key, value) {
+                                if (Array.isArray(value)) {
+                                    $.each(value, function(index, errorMsg) {
+                                        toastr.error(errorMsg);
+                                        errorMessage += errorMsg + '<br>';
+                                        
+                                        // Form field'a error class ekle
+                                        var inputField = $('[name="' + key + '"]');
+                                        if (inputField.length > 0) {
+                                            inputField.addClass('is-invalid');
+                                            inputField.after('<div class="invalid-feedback">' + errorMsg + '</div>');
+                                        }
+                                    });
+                                }
+                            });
+                            
+                            // Validation summary'e ekle
+                            if (errorMessage) {
+                                $('.validation-summary-errors').html('<ul><li>' + errorMessage.replace(/<br>/g, '</li><li>') + '</li></ul>');
+                            }
+                        } else {
+                            var errMsg = xhr.responseText ? xhr.responseText : 'Ürün eklenirken bir hata oluştu';
+                            toastr.error(errMsg);
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+} 

@@ -1,0 +1,59 @@
+@model marketimnet.Core.Entities.Order
+@{
+    ViewData["Title"] = "Sipariş Onayı";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+                    </div>
+                    <h2 class="mb-4">Siparişiniz Alındı!</h2>
+                    <p class="lead mb-4">Sipariş numaranız: <strong>@Model.OrderNumber</strong></p>
+                    <p class="text-muted mb-4">
+                        Siparişiniz başarıyla oluşturuldu. Sipariş durumunuz hakkında e-posta ile bilgilendirileceksiniz.
+                    </p>
+                    <hr class="my-4" />
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5>Teslimat Bilgileri</h5>
+                            <p class="mb-1">@Model.FullName</p>
+                            <p class="mb-1">@Model.Address</p>
+                            <p class="mb-1">@Model.District / @Model.City</p>
+                            <p class="mb-1">@Model.Phone</p>
+                            <p class="mb-0">@Model.Email</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Sipariş Özeti</h5>
+                            @foreach (var item in Model.OrderItems)
+                            {
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>@item.ProductName x @item.Quantity</span>
+                                    <span>@item.TotalPrice.ToString("C")</span>
+                                </div>
+                            }
+                            <hr class="my-2" />
+                            <div class="d-flex justify-content-between">
+                                <strong>Toplam</strong>
+                                <strong>@Model.TotalAmount.ToString("C")</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-center gap-3">
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-primary">
+                            <i class="fas fa-home me-2"></i>Anasayfaya Dön
+                        </a>
+                        @* Sipariş takip sayfası eklendiğinde bu link aktif edilebilir
+                        <a href="#" class="btn btn-outline-primary">
+                            <i class="fas fa-box me-2"></i>Siparişimi Takip Et
+                        </a>
+                        *@
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

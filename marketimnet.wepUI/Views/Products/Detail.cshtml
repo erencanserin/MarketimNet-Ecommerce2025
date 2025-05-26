@@ -1,0 +1,127 @@
+@model marketimnet.wepUI.Models.ProductDetailViewModel
+
+@{
+    ViewData["Title"] = Model.Product.Name;
+}
+
+<div class="container py-4 products-container">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Anasayfa</a></li>
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index", "Products", new { categoryId = Model.Product.CategoryId })">
+                    @Model.Product.Category?.Name
+                </a>
+            </li>
+            <li class="breadcrumb-item active">@Model.Product.Name</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Ürün Detayı -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="row g-0">
+                    <div class="col-md-6">
+                        @if (!string.IsNullOrEmpty(Model.Product.Image))
+                        {
+                            <img src="@Model.Product.Image" class="img-fluid rounded-start" alt="@Model.Product.Name">
+                        }
+                        else
+                        {
+                            <img src="~/img/no-image.png" class="img-fluid rounded-start" alt="Ürün görseli bulunamadı">
+                        }
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card-body">
+                            <h4 class="card-title mb-3">@Model.Product.Name</h4>
+                            <div class="fs-5 mb-5">
+                                @if (Model.Product.DiscountedPrice.HasValue)
+                                {
+                                    <span class="text-decoration-line-through">@Model.Product.Price.ToString("C")</span>
+                                    <span>@Model.Product.DiscountedPrice.Value.ToString("C")</span>
+                                }
+                                else
+                                {
+                                    <span>@Model.Product.Price.ToString("C")</span>
+                                }
+                            </div>
+                            <p class="card-text">@Model.Product.Description</p>
+                            <div class="d-flex">
+                                <i class="bi bi-tag me-2"></i>@Model.Product.Category?.Name
+                            </div>
+                            <button class="btn btn-primary btn-lg add-to-cart" data-product-id="@Model.Product.Id">
+                                <i class="bi bi-cart-plus me-2"></i>Sepete Ekle
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Benzer Ürünler -->
+        <div class="col-md-4">
+            <h5 class="mb-4">Benzer Ürünler</h5>
+            @foreach (var relatedProduct in Model.RelatedProducts)
+            {
+                <div class="card mb-3">
+                    <div class="row g-0">
+                        <div class="col-4">
+                            @if (!string.IsNullOrEmpty(relatedProduct.Image))
+                            {
+                                <img src="@relatedProduct.Image" class="img-fluid rounded-start" alt="@relatedProduct.Name">
+                            }
+                            else
+                            {
+                                <img src="~/img/no-image.png" class="img-fluid rounded-start" alt="Ürün görseli bulunamadı">
+                            }
+                        </div>
+                        <div class="col-8">
+                            <div class="card-body">
+                                <h6 class="card-title">@relatedProduct.Name</h6>
+                                <p class="card-text">@relatedProduct.Price.ToString("C2")</p>
+                                <a href="@Url.Action("Detail", new { id = relatedProduct.Id })" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye me-1"></i>İncele
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<hr class="footer-divider my-8">
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.add-to-cart').click(function () {
+                var productId = $(this).data('product-id');
+                $.post('/Cart/AddToCart', { productId: productId }, function (result) {
+                    if (result.success) {
+                        // Sepet sayısını güncelle
+                        $('#cartCount').text(result.cartCount);
+                        
+                        // Başarılı mesajı göster
+                        Swal.fire({
+                            title: 'Başarılı!',
+                            text: 'Ürün sepete eklendi.',
+                            icon: 'success',
+                            confirmButtonText: 'Tamam'
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Hata!',
+                            text: result.message || 'Ürün sepete eklenirken bir hata oluştu.',
+                            icon: 'error',
+                            confirmButtonText: 'Tamam'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+} 

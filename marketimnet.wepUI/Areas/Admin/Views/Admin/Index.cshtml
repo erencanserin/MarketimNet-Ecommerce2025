@@ -1,0 +1,58 @@
+@model marketimnet.wepUI.Areas.Admin.Models.LoginViewModel
+@{
+    ViewData["Title"] = "Admin Girişi";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutLogin.cshtml";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-xl-10 col-lg-12 col-md-9">
+            <div class="card o-hidden border-0 shadow-lg my-5">
+                <div class="card-body p-0">
+                    <div class="row">
+                        <div class="col-lg-6 d-none d-lg-block bg-login-image"></div>
+                        <div class="col-lg-6">
+                            <div class="p-5">
+                                <div class="text-center">
+                                    <h1 class="h4 text-gray-900 mb-4">Admin Girişi</h1>
+                                </div>
+                                <form class="user" asp-action="Login" asp-controller="Admin" asp-area="Admin" method="post">
+                                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                    
+                                    <div class="form-group mb-3">
+                                        <input asp-for="Username" class="form-control form-control-user" 
+                                               placeholder="Kullanıcı Adı">
+                                        <span asp-validation-for="Username" class="text-danger"></span>
+                                    </div>
+                                    
+                                    <div class="form-group mb-3">
+                                        <input asp-for="Password" class="form-control form-control-user" 
+                                               placeholder="Şifre">
+                                        <span asp-validation-for="Password" class="text-danger"></span>
+                                    </div>
+                                    
+                                    <div class="form-group mb-3">
+                                        <div class="custom-control custom-checkbox small">
+                                            <input asp-for="RememberMe" class="custom-control-input" id="customCheck">
+                                            <label class="custom-control-label" for="customCheck">
+                                                Beni Hatırla
+                                            </label>
+                                        </div>
+                                    </div>
+                                    
+                                    <button type="submit" class="btn btn-primary btn-user btn-block">
+                                        Giriş Yap
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+} 

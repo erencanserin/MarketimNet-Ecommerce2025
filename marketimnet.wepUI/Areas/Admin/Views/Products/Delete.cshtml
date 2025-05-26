@@ -1,0 +1,56 @@
+@model marketimnet.Core.Entities.Product
+
+@{
+    ViewData["Title"] = "Ürünü Sil";
+}
+
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">Ürün Sil</h1>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Ürün Bilgileri</h6>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">Ürün Adı</dt>
+                <dd class="col-sm-9">@Model.Name</dd>
+
+                <dt class="col-sm-3">Açıklama</dt>
+                <dd class="col-sm-9">@Model.Description</dd>
+
+                <dt class="col-sm-3">Fiyat</dt>
+                <dd class="col-sm-9">@Model.Price.ToString("C2")</dd>
+
+                <dt class="col-sm-3">İndirimli Fiyat</dt>
+                <dd class="col-sm-9">@(Model.DiscountedPrice?.ToString("C2") ?? "-")</dd>
+
+                <dt class="col-sm-3">Ürün Kodu</dt>
+                <dd class="col-sm-9">@Model.ProductCode</dd>
+
+                <dt class="col-sm-3">Kategori</dt>
+                <dd class="col-sm-9">@(Model.Category?.Name ?? "Kategori Yok")</dd>
+
+                <dt class="col-sm-3">Durum</dt>
+                <dd class="col-sm-9">@(Model.IsActive ? "Aktif" : "Pasif")</dd>
+
+                <dt class="col-sm-3">Oluşturulma Tarihi</dt>
+                <dd class="col-sm-9">@Model.CreatedDate.ToString("dd/MM/yyyy HH:mm")</dd>
+
+                <dt class="col-sm-3">Son Güncelleme</dt>
+                <dd class="col-sm-9">@(Model.UpdatedDate?.ToString("dd/MM/yyyy HH:mm") ?? "-")</dd>
+            </dl>
+
+            <div class="alert alert-danger" role="alert">
+                <h4 class="alert-heading">Dikkat!</h4>
+                <p>Bu ürünü silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.</p>
+            </div>
+
+            <form asp-action="Delete">
+                <input type="hidden" asp-for="Id" />
+                <input type="submit" value="Sil" class="btn btn-danger" />
+                <a asp-action="Index" class="btn btn-secondary">Geri Dön</a>
+            </form>
+        </div>
+    </div>
+</div> 

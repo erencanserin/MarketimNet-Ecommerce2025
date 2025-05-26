@@ -1,0 +1,32 @@
+@model IEnumerable<marketimnet.Core.Entities.Category>
+
+@foreach (var category in Model)
+{
+    if (category.SubCategories != null && category.SubCategories.Any(c => c.IsActive))
+    {
+        <li class="dropdown-submenu">
+            <a class="dropdown-item" href="@Url.Action("Index", "Products", new { categoryId = category.Id })">
+                @category.Name
+                <i class="bi bi-chevron-right float-end"></i>
+            </a>
+            <ul class="dropdown-menu">
+                @foreach (var subCategory in category.SubCategories.Where(c => c.IsActive).OrderBy(c => c.OrderNo))
+                {
+                    <li>
+                        <a class="dropdown-item" href="@Url.Action("Index", "Products", new { categoryId = subCategory.Id })">
+                            @subCategory.Name
+                        </a>
+                    </li>
+                }
+            </ul>
+        </li>
+    }
+    else
+    {
+        <li>
+            <a class="dropdown-item" href="@Url.Action("Index", "Products", new { categoryId = category.Id })">
+                @category.Name
+            </a>
+        </li>
+    }
+} 

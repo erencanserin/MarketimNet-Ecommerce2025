@@ -1,0 +1,210 @@
+@model List<marketimnet.Core.Entities.CartItem>
+
+@{
+    ViewData["Title"] = "Sepetim";
+}
+
+<div class="container py-5">
+    <h2 class="mb-4">Alışveriş Sepeti</h2>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        @foreach (var item in Model)
+                        {
+                            <div class="d-flex align-items-center mb-3 cart-item" data-product-id="@item.ProductId">
+                                <div class="flex-shrink-0">
+                                    @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                    {
+                                        <img src="@item.ImageUrl" alt="@item.ProductName" class="img-thumbnail" style="width: 100px; height: 100px; object-fit: cover;">
+                                    }
+                                    else
+                                    {
+                                        <img src="https://via.placeholder.com/100" alt="@item.ProductName" class="img-thumbnail">
+                                    }
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h5 class="mb-1">@item.ProductName</h5>
+                                    <p class="mb-1 text-muted">Birim Fiyat: @item.Price.ToString("C")</p>
+                                    <div class="d-flex align-items-center">
+                                        <div class="input-group" style="width: 150px;">
+                                            <button class="btn btn-outline-secondary decrease-quantity" type="button">
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                            <input type="number" class="form-control text-center quantity-input" value="@item.Quantity" min="1" max="99">
+                                            <button class="btn btn-outline-secondary increase-quantity" type="button">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </div>
+                                        <button class="btn btn-outline-danger ms-3 remove-item">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="ms-auto">
+                                    <h5 class="mb-0 item-total">@((item.Price * item.Quantity).ToString("C"))</h5>
+                                </div>
+                            </div>
+                            @if (!Model.Last().Equals(item))
+                            {
+                                <hr class="my-3">
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h4 class="card-title mb-3">Sipariş Özeti</h4>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Ara Toplam</span>
+                            <span id="subtotal">@Model.Sum(x => x.Price * x.Quantity).ToString("C")</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>KDV (%18)</span>
+                            <span id="tax">@((Model.Sum(x => x.Price * x.Quantity) * 0.18m).ToString("C"))</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between mb-3">
+                            <strong>Toplam</strong>
+                            <strong id="total">@((Model.Sum(x => x.Price * x.Quantity) * 1.18m).ToString("C"))</strong>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <a asp-action="Checkout" class="btn btn-primary">
+                                <i class="fas fa-credit-card me-2"></i>Siparişi Tamamla
+                            </a>
+                            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Alışverişe Devam Et
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="fas fa-shopping-cart fa-4x text-muted mb-3"></i>
+            <h3>Sepetiniz Boş</h3>
+            <p class="text-muted">Sepetinizde ürün bulunmamaktadır.</p>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-primary">
+                <i class="fas fa-arrow-left me-2"></i>Alışverişe Başla
+            </a>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            function updateQuantity(productId, quantity) {
+                $.ajax({
+                    url: '@Url.Action("UpdateQuantity", "Cart")',
+                    type: 'POST',
+                    data: {
+                        productId: productId,
+                        quantity: quantity,
+                        __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            location.reload();
+                        } else {
+                            Swal.fire({
+                                title: 'Hata!',
+                                text: response.message,
+                                icon: 'error',
+                                confirmButtonText: 'Tamam'
+                            });
+                        }
+                    },
+                    error: function () {
+                        Swal.fire({
+                            title: 'Hata!',
+                            text: 'Miktar güncellenirken bir hata oluştu.',
+                            icon: 'error',
+                            confirmButtonText: 'Tamam'
+                        });
+                    }
+                });
+            }
+
+            $('.increase-quantity').click(function () {
+                var input = $(this).siblings('.quantity-input');
+                var currentValue = parseInt(input.val());
+                if (currentValue < 99) {
+                    var productId = $(this).closest('.cart-item').data('product-id');
+                    updateQuantity(productId, currentValue + 1);
+                }
+            });
+
+            $('.decrease-quantity').click(function () {
+                var input = $(this).siblings('.quantity-input');
+                var currentValue = parseInt(input.val());
+                if (currentValue > 1) {
+                    var productId = $(this).closest('.cart-item').data('product-id');
+                    updateQuantity(productId, currentValue - 1);
+                }
+            });
+
+            $('.quantity-input').change(function () {
+                var value = parseInt($(this).val());
+                if (value < 1) value = 1;
+                if (value > 99) value = 99;
+                $(this).val(value);
+                var productId = $(this).closest('.cart-item').data('product-id');
+                updateQuantity(productId, value);
+            });
+
+            $('.remove-item').click(function () {
+                var productId = $(this).closest('.cart-item').data('product-id');
+                Swal.fire({
+                    title: 'Emin misiniz?',
+                    text: "Bu ürünü sepetten kaldırmak istediğinize emin misiniz?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Evet, Kaldır',
+                    cancelButtonText: 'İptal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '@Url.Action("RemoveFromCart", "Cart")',
+                            type: 'POST',
+                            data: {
+                                productId: productId,
+                                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                            },
+                            success: function (response) {
+                                if (response.success) {
+                                    location.reload();
+                                } else {
+                                    Swal.fire({
+                                        title: 'Hata!',
+                                        text: response.message,
+                                        icon: 'error',
+                                        confirmButtonText: 'Tamam'
+                                    });
+                                }
+                            },
+                            error: function () {
+                                Swal.fire({
+                                    title: 'Hata!',
+                                    text: 'Ürün kaldırılırken bir hata oluştu.',
+                                    icon: 'error',
+                                    confirmButtonText: 'Tamam'
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+} 

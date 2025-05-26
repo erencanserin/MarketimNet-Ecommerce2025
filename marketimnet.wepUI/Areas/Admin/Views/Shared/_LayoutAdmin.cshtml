@@ -1,0 +1,283 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>@ViewData["Title"] - Marketimnet Admin</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="~/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="~/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="~/img/favicon-16x16.png">
+
+    <!-- Custom fonts for this template-->
+    <link href="~/Admin/startbootstrap-sb-admin-2-gh-pages/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="~/Admin/startbootstrap-sb-admin-2-gh-pages/css/sb-admin-2.min.css" rel="stylesheet">
+    
+    <!-- Toastr notifications -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet" />
+
+    <!-- DataTables CSS -->
+    <link href="~/Admin/startbootstrap-sb-admin-2-gh-pages/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+</head>
+
+<body id="page-top">
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+        <!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+            <!-- Sidebar - Brand -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center py-4" asp-area="Admin" asp-controller="Main" asp-action="Index">
+                <div class="sidebar-brand-icon">
+                    <img src="~/img/logo.svg" alt="Marketimnet" class="admin-logo">
+                </div>
+            </a>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+            <!-- Nav Item - Dashboard -->
+            <li class="nav-item">
+                <a class="nav-link" asp-area="Admin" asp-controller="Main" asp-action="Index">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Yönetim
+            </div>
+
+            <!-- Nav Item - Categories -->
+            <li class="nav-item">
+                <a class="nav-link" asp-area="Admin" asp-controller="Categories" asp-action="Index">
+                    <i class="fas fa-fw fa-folder"></i>
+                    <span>Kategoriler</span>
+                </a>
+            </li>
+
+            <!-- Nav Item - Products -->
+            <li class="nav-item">
+                <a class="nav-link" asp-area="Admin" asp-controller="Products" asp-action="Index">
+                    <i class="fas fa-fw fa-box"></i>
+                    <span>Ürünler</span>
+                </a>
+            </li>
+
+            <!-- Nav Item - Orders -->
+            <li class="nav-item">
+                <a class="nav-link" asp-area="Admin" asp-controller="Orders" asp-action="Index">
+                    <i class="fas fa-fw fa-shopping-cart"></i>
+                    <span>Siparişler</span>
+                </a>
+            </li>
+
+            <!-- Nav Item - Users -->
+            <li class="nav-item">
+                <a class="nav-link" asp-area="Admin" asp-controller="Users" asp-action="Index">
+                    <i class="fas fa-fw fa-users"></i>
+                    <span>Kullanıcılar</span>
+                </a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider d-none d-md-block">
+
+            <!-- Sidebar Toggler (Sidebar) -->
+            <div class="text-center d-none d-md-inline">
+                <button class="rounded-circle border-0" id="sidebarToggle"></button>
+            </div>
+        </ul>
+        <!-- End of Sidebar -->
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+            <!-- Main Content -->
+            <div id="content">
+                <!-- Topbar -->
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                    <!-- Sidebar Toggle (Topbar) -->
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
+
+                    <!-- Topbar Navbar -->
+                    <ul class="navbar-nav ml-auto">
+                        <div class="topbar-divider d-none d-sm-block"></div>
+
+                        <!-- Nav Item - User Information -->
+                        <li class="nav-item dropdown no-arrow">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Admin</span>
+                                <img class="img-profile rounded-circle" src="~/Admin/startbootstrap-sb-admin-2-gh-pages/img/undraw_profile.svg">
+                            </a>
+                            <!-- Dropdown - User Information -->
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                aria-labelledby="userDropdown">
+                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Çıkış Yap
+                                </a>
+                            </div>
+                        </li>
+                    </ul>
+                </nav>
+                <!-- End of Topbar -->
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+                    @RenderBody()
+                </div>
+                <!-- /.container-fluid -->
+            </div>
+            <!-- End of Main Content -->
+
+            <!-- Footer -->
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <span>Copyright &copy; Marketimnet @DateTime.Now.Year</span>
+                    </div>
+                </div>
+            </footer>
+            <!-- End of Footer -->
+        </div>
+        <!-- End of Content Wrapper -->
+    </div>
+    <!-- End of Page Wrapper -->
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Çıkış yapmak istediğinize emin misiniz?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Mevcut oturumunuzu sonlandırmak için "Çıkış Yap" butonuna tıklayın.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">İptal</button>
+                    <form asp-area="Admin" asp-controller="Main" asp-action="Logout" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-primary">Çıkış Yap</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="~/Admin/startbootstrap-sb-admin-2-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="~/Admin/startbootstrap-sb-admin-2-gh-pages/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="~/Admin/startbootstrap-sb-admin-2-gh-pages/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="~/Admin/startbootstrap-sb-admin-2-gh-pages/js/sb-admin-2.min.js"></script>
+    
+    <!-- Toastr notifications -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    
+    <!-- DataTables JS -->
+    <script src="~/Admin/startbootstrap-sb-admin-2-gh-pages/vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="~/Admin/startbootstrap-sb-admin-2-gh-pages/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+    
+    <script>
+        // Toastr configuration
+        toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": false,
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+        
+        // Display TempData messages with toastr
+        @if (TempData["Success"] != null)
+        {
+            <text>
+            $(document).ready(function() {
+                toastr.success('@TempData["Success"]');
+            });
+            </text>
+        }
+        
+        @if (TempData["Error"] != null)
+        {
+            <text>
+            $(document).ready(function() {
+                toastr.error('@TempData["Error"]');
+            });
+            </text>
+        }
+        
+        @if (TempData["Info"] != null)
+        {
+            <text>
+            $(document).ready(function() {
+                toastr.info('@TempData["Info"]');
+            });
+            </text>
+        }
+        
+        @if (TempData["Warning"] != null)
+        {
+            <text>
+            $(document).ready(function() {
+                toastr.warning('@TempData["Warning"]');
+            });
+            </text>
+        }
+    </script>
+
+    <style>
+        .admin-logo {
+            height: 40px;
+            width: auto;
+            min-width: 180px;
+            max-width: 90%;
+            filter: brightness(0) invert(1);
+            transition: transform 0.3s ease;
+        }
+        
+        .sidebar-brand:hover .admin-logo {
+            transform: scale(1.02);
+        }
+
+        .sidebar-brand {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem 0.5rem;
+        }
+    </style>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

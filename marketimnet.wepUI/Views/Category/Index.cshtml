@@ -1,0 +1,48 @@
+@model IEnumerable<marketimnet.Core.Entities.Category>
+@{
+    ViewData["Title"] = "Kategoriler";
+}
+
+<div class="container">
+    <h2 class="mb-4">Tüm Kategoriler</h2>
+
+    <div class="row">
+        @foreach (var category in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">@category.Name</h5>
+                        @if (!string.IsNullOrEmpty(category.Description))
+                        {
+                            <p class="card-text">@category.Description</p>
+                        }
+                        @if (category.SubCategories != null && category.SubCategories.Any(c => c.IsActive))
+                        {
+                            <div class="mt-3">
+                                <h6>Alt Kategoriler:</h6>
+                                <ul class="list-group list-group-flush">
+                                    @foreach (var subCategory in category.SubCategories.Where(c => c.IsActive).OrderBy(c => c.OrderNo))
+                                    {
+                                        <li class="list-group-item">
+                                            <a href="@Url.Action("Index", "Products", new { categoryId = subCategory.Id })" 
+                                               class="text-decoration-none">
+                                                @subCategory.Name
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+                    </div>
+                    <div class="card-footer">
+                        <a href="@Url.Action("Index", "Products", new { categoryId = category.Id })" 
+                           class="btn btn-primary w-100">
+                            <i class="bi bi-box-seam me-2"></i>Ürünleri Gör
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div> 

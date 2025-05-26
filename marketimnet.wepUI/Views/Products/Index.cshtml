@@ -1,0 +1,149 @@
+@model ProductListViewModel
+
+@{
+    ViewData["Title"] = Model.CurrentCategory?.Name ?? "Ürünler";
+}
+
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            @if (Model.IsDiscountedPage)
+            {
+                <h2 class="mb-3">
+                    <i class="bi bi-tag-fill text-danger me-2"></i>İndirimli Ürünler
+                </h2>
+                <p class="text-muted">En avantajlı fiyatlarla sizin için seçtiğimiz ürünler</p>
+            }
+            else if (Model.CurrentCategory != null)
+            {
+                <h2 class="mb-3">@Model.CurrentCategory.Name</h2>
+                @if (!string.IsNullOrEmpty(Model.CurrentCategory.Description))
+                {
+                    <p class="text-muted">@Model.CurrentCategory.Description</p>
+                }
+            }
+            else if (!string.IsNullOrEmpty(Model.SearchTerm))
+            {
+                <h2 class="mb-3">Arama Sonuçları: "@Model.SearchTerm"</h2>
+            }
+            else
+            {
+                <h2 class="mb-3">Tüm Ürünler</h2>
+            }
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Kategoriler -->
+        <div class="col-lg-3">
+            <h5 class="mb-4">Kategoriler</h5>
+            <div class="list-group">
+                <a href="@Url.Action("Index", new { search = Model.SearchTerm })" 
+                   class="list-group-item list-group-item-action @(Model.CurrentCategory == null ? "active" : "")">
+                    Tüm Kategoriler
+                </a>
+                @foreach (var category in Model.Categories)
+                {
+                    var isActive = Model.CurrentCategory?.Id == category.Id;
+                    <a href="@Url.Action("Index", new { categoryId = category.Id, search = Model.SearchTerm })" 
+                       class="list-group-item list-group-item-action @(isActive ? "active" : "")">
+                        @category.Name
+                    </a>
+                }
+            </div>
+        </div>
+
+        <!-- Ürünler -->
+        <div class="col-lg-9">
+            <!-- Arama -->
+            <div class="mb-4">
+                <form method="get" class="d-flex">
+                    <input type="hidden" name="categoryId" value="@Model.CurrentCategory?.Id" />
+                    <input type="text" name="search" value="@Model.SearchTerm" class="form-control me-2" placeholder="Ürün ara..." />
+                    <button type="submit" class="btn btn-primary">Ara</button>
+                </form>
+            </div>
+
+            <!-- Ürün Listesi -->
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                @foreach (var product in Model.Products)
+                {
+                    <div class="col">
+                        <div class="card h-100">
+                            <img src="@(string.IsNullOrEmpty(product.ImageUrl) ? "/img/no-image.png" : product.ImageUrl)" 
+                                 class="card-img-top" alt="@product.Name">
+                            <div class="card-body">
+                                <h5 class="card-title">@product.Name</h5>
+                                <p class="card-text">@product.Category?.Name</p>
+                                <p class="card-text">
+                                    @if (product.DiscountedPrice.HasValue)
+                                    {
+                                        <span class="text-decoration-line-through">@product.Price.ToString("C")</span>
+                                        <span class="text-danger">@product.DiscountedPrice.Value.ToString("C")</span>
+                                    }
+                                    else
+                                    {
+                                        <span>@product.Price.ToString("C")</span>
+                                    }
+                                </p>
+                                <a href="@Url.Action("Detail", new { id = product.Id })" class="btn btn-primary">
+                                    Detay
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Sayfalama -->
+            @if (Model.TotalPages > 1)
+            {
+                <nav class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("Index", new { categoryId = Model.CurrentCategory?.Id, search = Model.SearchTerm, page = i })">
+                                    @i
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            }
+        </div>
+    </div>
+</div>
+
+<hr class="footer-divider my-8">
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.add-to-cart').click(function () {
+                var productId = $(this).data('product-id');
+                $.post('/Cart/AddToCart', { productId: productId }, function (result) {
+                    if (result.success) {
+                        // Sepet sayısını güncelle
+                        $('#cartCount').text(result.cartCount);
+                        
+                        // Başarılı mesajı göster
+                        Swal.fire({
+                            title: 'Başarılı!',
+                            text: 'Ürün sepete eklendi.',
+                            icon: 'success',
+                            confirmButtonText: 'Tamam'
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Hata!',
+                            text: result.message || 'Ürün sepete eklenirken bir hata oluştu.',
+                            icon: 'error',
+                            confirmButtonText: 'Tamam'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+} 

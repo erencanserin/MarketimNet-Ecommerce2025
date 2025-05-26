@@ -1,0 +1,50 @@
+    <!-- DataTables -->
+    <link href="~/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <!-- Toastr -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="~/css/sb-admin-2.min.css" rel="stylesheet">
+
+    <!-- Page level plugins -->
+    <script src="~/vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="~/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+    <!-- Toastr -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+
+    <!-- Custom scripts -->
+    <script src="~/js/sb-admin-2.min.js"></script>
+
+    <script>
+        // Toastr ayarları
+        toastr.options = {
+            "closeButton": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "timeOut": "3000"
+        };
+
+        // TempData mesajlarını göster
+        @if (TempData["Success"] != null)
+        {
+            <text>
+            toastr.success('@TempData["Success"]');
+            </text>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <text>
+            toastr.error('@TempData["Error"]');
+            </text>
+        }
+
+        @if (TempData["Warning"] != null)
+        {
+            <text>
+            toastr.warning('@TempData["Warning"]');
+            </text>
+        }
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false) 

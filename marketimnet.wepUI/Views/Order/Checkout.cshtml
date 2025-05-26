@@ -1,0 +1,142 @@
+@using marketimnet.Core.ViewModels
+@model OrderViewModel
+
+@{
+    ViewData["Title"] = "Sipariş Onayı";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Sipariş Özeti</h4>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Ürün</th>
+                                    <th>Adet</th>
+                                    <th class="text-end">Fiyat</th>
+                                    <th class="text-end">Toplam</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.CartItems)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img src="@item.Product.ImageUrl" alt="@item.Product.Name" style="width: 50px; height: 50px; object-fit: cover;" class="me-2">
+                                                <div>
+                                                    <h6 class="mb-0">@item.Product.Name</h6>
+                                                    <small class="text-muted">@item.Product.Category?.Name</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>@item.Quantity</td>
+                                        <td class="text-end">@item.Product.Price.ToString("C2")</td>
+                                        <td class="text-end">@((item.Product.Price * item.Quantity).ToString("C2"))</td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>Toplam:</strong></td>
+                                    <td class="text-end"><strong>@Model.TotalAmount.ToString("C2")</strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <form asp-action="Checkout" method="post">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h4 class="card-title mb-4">Teslimat Bilgileri</h4>
+                        
+                        <div class="mb-3">
+                            <label asp-for="ShippingAddress" class="form-label"></label>
+                            <textarea asp-for="ShippingAddress" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="ShippingAddress" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Notes" class="form-label"></label>
+                            <textarea asp-for="Notes" class="form-control" rows="2"></textarea>
+                            <span asp-validation-for="Notes" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h4 class="card-title mb-4">Ödeme Bilgileri</h4>
+                        
+                        <div class="mb-3">
+                            <label asp-for="CardHolderName" class="form-label"></label>
+                            <input asp-for="CardHolderName" class="form-control" />
+                            <span asp-validation-for="CardHolderName" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="CardNumber" class="form-label"></label>
+                            <input asp-for="CardNumber" class="form-control" maxlength="16" />
+                            <span asp-validation-for="CardNumber" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ExpiryDate" class="form-label"></label>
+                                <input asp-for="ExpiryDate" class="form-control" placeholder="AA/YY" maxlength="5" />
+                                <span asp-validation-for="ExpiryDate" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Cvc" class="form-label"></label>
+                                <input asp-for="Cvc" class="form-control" maxlength="3" />
+                                <span asp-validation-for="Cvc" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-check me-2"></i>Siparişi Onayla
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        $(document).ready(function() {
+            // Kredi kartı numarası formatı
+            $('#CardNumber').on('input', function() {
+                $(this).val($(this).val().replace(/\D/g, ''));
+            });
+
+            // Son kullanma tarihi formatı (AA/YY)
+            $('#ExpiryDate').on('input', function() {
+                var value = $(this).val().replace(/\D/g, '');
+                if (value.length > 2) {
+                    value = value.substr(0, 2) + '/' + value.substr(2);
+                }
+                $(this).val(value);
+            });
+
+            // CVC formatı
+            $('#Cvc').on('input', function() {
+                $(this).val($(this).val().replace(/\D/g, ''));
+            });
+        });
+    </script>
+} 
