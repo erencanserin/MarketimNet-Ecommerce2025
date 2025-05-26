@@ -1,3 +1,4 @@
+![Screenshot_2](https://github.com/user-attachments/assets/c5f10020-4957-468d-b4c0-25e8f126d271)
 ### MarketimNet
 # 🛒 MarketimNet
 
@@ -27,4 +28,4 @@ Modern ve sade tasarım anlayışıyla geliştirilen arayüz, kullanıcıların 
    git clone https://github.com/kullaniciAdi/marketimnet.git
 
  
-![Screenshot_2](https://github.com/user-attachments/assets/c5f10020-4957-468d-b4c0-25e8f126d271)
+
