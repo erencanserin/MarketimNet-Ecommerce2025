@@ -20,14 +20,6 @@ Modern ve sade tasarım anlayışıyla geliştirilen arayüz, kullanıcıların 
 
 ---
 
-## 📅 Yol Haritası
-1. Sepet sistemi tamamlanacak  
-2. Ödeme sistemi entegre edilecek  
-3. Yönetici paneli geliştirilecek  
-4. UI iyileştirmeleri yapılacak
-
----
-
 ## 📂 Projeyi Çalıştırma
 
 1. Bu repoyu klonlayın:  
