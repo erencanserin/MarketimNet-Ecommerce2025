@@ -25,7 +25,7 @@ Modern ve sade tasarım anlayışıyla geliştirilen arayüz, kullanıcıların 
 
 1. Bu repoyu klonlayın:  
    ```bash
-   git clone https://github.com/kullaniciAdi/marketimnet.git
+   git clone https://github.com/erencanserin/MarketimNet-Ecommerce2025.git
 
  
 
