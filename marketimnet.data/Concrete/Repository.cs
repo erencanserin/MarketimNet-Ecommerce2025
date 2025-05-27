@@ -29,10 +29,18 @@ namespace marketimnet.Data.Concrete
             return entity;
         }
 
-        public async Task<int> DeleteAsync(T entity)
+        public async Task<bool> DeleteAsync(T entity)
         {
-            _dbSet.Remove(entity);
-            return await _context.SaveChangesAsync();
+            try
+            {
+                _context.Set<T>().Remove(entity);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public async Task<T> GetByIdAsync(int id)

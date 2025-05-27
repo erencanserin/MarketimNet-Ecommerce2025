@@ -17,8 +17,8 @@ namespace marketimnet.Core.Entities
         
         public virtual Product Product { get; set; }
 
-        [NotMapped]
-        public string ProductName => Product?.Name;
+        [Required]
+        public string ProductName { get; set; }
         
         public int Quantity { get; set; } = 1;
         

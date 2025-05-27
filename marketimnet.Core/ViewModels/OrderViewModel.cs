@@ -5,7 +5,8 @@ namespace marketimnet.Core.ViewModels
 {
     public class OrderViewModel
     {
-        public List<CartItem> CartItems { get; set; }
+        [Display(Name = "Sepet")]
+        public List<CartItem> CartItems { get; set; } = new List<CartItem>();
         public decimal TotalAmount { get; set; }
 
         [Required(ErrorMessage = "Teslimat adresi zorunludur")]

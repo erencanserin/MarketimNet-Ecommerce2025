@@ -1,8 +1,10 @@
 using marketimnet.Core.Entities;
+using marketimnet.Core.ViewModels;
 using marketimnet.Data;
 using marketimnet.Data.Abstract;
 using marketimnet.Service.Abstract;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
 
 namespace marketimnet.Service.Concrete
@@ -11,16 +13,29 @@ namespace marketimnet.Service.Concrete
     {
         private readonly IRepository<Order> _repository;
         private readonly DatabaseContext _context;
+        private readonly ILogger<OrderService> _logger;
 
-        public OrderService(IRepository<Order> repository, DatabaseContext context)
+        public OrderService(IRepository<Order> repository, DatabaseContext context, ILogger<OrderService> logger)
         {
             _repository = repository;
             _context = context;
+            _logger = logger;
         }
 
         public async Task<Order> AddAsync(Order entity)
         {
-            return await _repository.AddAsync(entity);
+            try
+            {
+                _logger.LogInformation($"Sipariş ekleniyor: {entity.OrderNumber}");
+                var result = await _repository.AddAsync(entity);
+                _logger.LogInformation($"Sipariş başarıyla eklendi: {entity.OrderNumber}");
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Sipariş eklenirken hata oluştu: {entity.OrderNumber}");
+                throw;
+            }
         }
 
         public async Task<bool> AnyAsync(Expression<Func<Order, bool>> expression)
@@ -28,14 +43,36 @@ namespace marketimnet.Service.Concrete
             return await _repository.AnyAsync(expression);
         }
 
-        public async Task<int> DeleteAsync(Order entity)
+        public async Task<bool> DeleteAsync(Order entity)
         {
-            return await _repository.DeleteAsync(entity);
+            try
+            {
+                _logger.LogInformation($"Sipariş siliniyor: {entity.OrderNumber}");
+                var result = await _repository.DeleteAsync(entity);
+                _logger.LogInformation($"Sipariş başarıyla silindi: {entity.OrderNumber}");
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Sipariş silinirken hata oluştu: {entity.OrderNumber}");
+                throw;
+            }
         }
 
         public async Task<List<Order>> GetAllAsync()
         {
-            return await _repository.GetAllAsync();
+            try
+            {
+                _logger.LogInformation("Tüm siparişler getiriliyor");
+                var orders = await _repository.GetAllAsync();
+                _logger.LogInformation($"Toplam {orders.Count} sipariş getirildi");
+                return orders;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Siparişler getirilirken hata oluştu");
+                throw;
+            }
         }
 
         public async Task<List<Order>> GetAllAsync(Expression<Func<Order, bool>> expression)
@@ -45,7 +82,25 @@ namespace marketimnet.Service.Concrete
 
         public async Task<Order> GetByIdAsync(int id)
         {
-            return await _repository.GetByIdAsync(id);
+            try
+            {
+                _logger.LogInformation($"Sipariş getiriliyor: {id}");
+                var order = await _repository.GetByIdAsync(id);
+                if (order != null)
+                {
+                    _logger.LogInformation($"Sipariş bulundu: {order.OrderNumber}");
+                }
+                else
+                {
+                    _logger.LogWarning($"Sipariş bulunamadı: {id}");
+                }
+                return order;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Sipariş getirilirken hata oluştu: {id}");
+                throw;
+            }
         }
 
         public async Task<Order> GetByOrderNumberAsync(string orderNumber)
@@ -55,7 +110,18 @@ namespace marketimnet.Service.Concrete
 
         public async Task<Order> UpdateAsync(Order entity)
         {
-            return await _repository.UpdateAsync(entity);
+            try
+            {
+                _logger.LogInformation($"Sipariş güncelleniyor: {entity.OrderNumber}");
+                var result = await _repository.UpdateAsync(entity);
+                _logger.LogInformation($"Sipariş başarıyla güncellendi: {entity.OrderNumber}");
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Sipariş güncellenirken hata oluştu: {entity.OrderNumber}");
+                throw;
+            }
         }
 
         public async Task<List<Order>> GetOrdersByDateRangeAsync(DateTime startDate, DateTime endDate)
@@ -72,7 +138,7 @@ namespace marketimnet.Service.Concrete
 
         public async Task<List<Order>> GetOrdersByCustomerAsync(string customerEmail)
         {
-            return await _repository.GetAllAsync(o => o.Email == customerEmail);
+            return await _repository.GetAllAsync(o => o.Email == customerEmail || o.FullName.Contains(customerEmail));
         }
 
         public async Task<decimal> GetTotalSalesAsync(DateTime startDate, DateTime endDate)
@@ -98,13 +164,29 @@ namespace marketimnet.Service.Concrete
             return true;
         }
 
-        public async Task<List<Order>> GetAllOrdersWithDetailsAsync()
+        public async Task<List<OrderListViewModel>> GetAllOrdersWithDetailsAsync()
         {
-            return await _context.Orders
-                .Include(o => o.OrderItems)
-                    .ThenInclude(oi => oi.Product)
-                .OrderByDescending(o => o.CreatedDate)
-                .ToListAsync();
+            try
+            {
+                _logger.LogInformation("Tüm siparişler detaylarıyla getiriliyor");
+                var orders = await _repository.GetAllAsync();
+                var orderViewModels = orders.Select(o => new OrderListViewModel
+                {
+                    Id = o.Id,
+                    OrderNumber = o.OrderNumber,
+                    FullName = o.FullName,
+                    OrderDate = o.OrderDate,
+                    TotalAmount = o.TotalAmount,
+                    Status = o.Status
+                }).ToList();
+                _logger.LogInformation($"Toplam {orderViewModels.Count} sipariş detayı getirildi");
+                return orderViewModels;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Sipariş detayları getirilirken hata oluştu");
+                throw;
+            }
         }
 
         public async Task<Order> GetOrderByIdWithDetailsAsync(int id)

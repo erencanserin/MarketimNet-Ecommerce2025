@@ -1,4 +1,5 @@
 using marketimnet.Core.Entities;
+using marketimnet.Core.ViewModels;
 using System.Linq.Expressions;
 
 namespace marketimnet.Service.Abstract
@@ -7,7 +8,7 @@ namespace marketimnet.Service.Abstract
     {
         Task<Order> AddAsync(Order entity);
         Task<Order> UpdateAsync(Order entity);
-        Task<int> DeleteAsync(Order entity);
+        Task<bool> DeleteAsync(Order entity);
         Task<Order> GetByIdAsync(int id);
         Task<List<Order>> GetAllAsync();
         Task<List<Order>> GetAllAsync(Expression<Func<Order, bool>> expression);
@@ -19,12 +20,10 @@ namespace marketimnet.Service.Abstract
         Task<decimal> GetTotalSalesAsync(DateTime startDate, DateTime endDate);
         Task<List<OrderItem>> GetOrderItemsAsync(int orderId);
         Task<bool> UpdateOrderStatusAsync(int orderId, string newStatus);
-        
-        // Yeni eklenen metodlar
-        Task<List<Order>> GetAllOrdersWithDetailsAsync();
         Task<Order> GetOrderByIdWithDetailsAsync(int id);
         Task<Order> UpdateOrderAsync(Order order);
         Task<bool> DeleteOrderAsync(int id);
         Task<int> GetTotalOrderCountAsync();
+        Task<List<OrderListViewModel>> GetAllOrdersWithDetailsAsync();
     }
 } 

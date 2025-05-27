@@ -355,18 +355,36 @@ namespace marketimnet.wepUI.Controllers
         {
             try
             {
+                _logger.LogInformation("Checkout işlemi başlatıldı");
+                _logger.LogInformation($"Gelen model: ShippingAddress={model.ShippingAddress}, CardHolderName={model.CardHolderName}");
+
                 var cart = GetCartFromSession();
                 if (cart == null || !cart.Any())
                 {
-                    ModelState.AddModelError("", "Sepetinizde ürün bulunmamaktadır.");
-                    return View(model);
+                    _logger.LogWarning("Sepet boş veya null");
+                    return Json(new { success = false, message = "Sepetinizde ürün bulunmamaktadır." });
                 }
 
+                _logger.LogInformation($"Sepet ürün sayısı: {cart.Count}, Toplam tutar: {cart.Sum(x => x.Price * x.Quantity)}");
+
+                // Model validasyonu
                 if (!ModelState.IsValid)
                 {
-                    model.CartItems = cart;
-                    model.TotalAmount = cart.Sum(x => x.Price * x.Quantity);
-                    return View(model);
+                    _logger.LogWarning("Model validation failed");
+                    foreach (var modelState in ModelState.Values)
+                    {
+                        foreach (var error in modelState.Errors)
+                        {
+                            _logger.LogWarning($"Validation error: {error.ErrorMessage}");
+                        }
+                    }
+
+                    var errors = ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage)
+                        .ToList();
+
+                    return Json(new { success = false, message = "Lütfen tüm alanları doldurun.", errors = errors });
                 }
 
                 // Kredi kartı doğrulama ve ödeme işlemi burada yapılacak
@@ -375,11 +393,10 @@ namespace marketimnet.wepUI.Controllers
 
                 if (!paymentSuccess)
                 {
-                    ModelState.AddModelError("", "Ödeme işlemi başarısız oldu. Lütfen tekrar deneyin.");
-                    model.CartItems = cart;
-                    model.TotalAmount = cart.Sum(x => x.Price * x.Quantity);
-                    return View(model);
+                    return Json(new { success = false, message = "Ödeme işlemi başarısız oldu. Lütfen tekrar deneyin." });
                 }
+
+                _logger.LogInformation("Sipariş oluşturuluyor...");
 
                 // Sipariş oluştur
                 var order = new Order
@@ -391,58 +408,65 @@ namespace marketimnet.wepUI.Controllers
                     Address = model.ShippingAddress,
                     Note = model.Notes,
                     TotalAmount = cart.Sum(x => x.Price * x.Quantity),
+                    Email = null, // Opsiyonel alan
+                    Phone = null, // Opsiyonel alan
+                    City = null, // Opsiyonel alan
+                    District = null, // Opsiyonel alan
+                    ZipCode = null, // Opsiyonel alan
                     OrderItems = cart.Select(item => new OrderItem
                     {
                         ProductId = item.ProductId,
+                        ProductName = item.ProductName,
                         Quantity = item.Quantity,
                         UnitPrice = item.Price,
                         TotalPrice = item.Price * item.Quantity
                     }).ToList()
                 };
 
-                // Siparişi kaydet
-                await _orderService.AddAsync(order);
+                _logger.LogInformation($"Sipariş nesnesi oluşturuldu: OrderNumber={order.OrderNumber}, TotalAmount={order.TotalAmount}");
+
+                try
+                {
+                    // Siparişi kaydet
+                    await _orderService.AddAsync(order);
+                    _logger.LogInformation($"Sipariş başarıyla kaydedildi: {order.OrderNumber}");
+                }
+                catch (Exception dbEx)
+                {
+                    _logger.LogError(dbEx, "Sipariş veritabanına kaydedilirken hata oluştu");
+                    throw; // Üst catch bloğuna yönlendir
+                }
 
                 // Sepeti temizle
                 HttpContext.Session.Remove(CartSessionKey);
+                _logger.LogInformation("Sepet temizlendi");
 
                 // Bildirim gönder
-                await _hubContext.Clients.All.SendAsync("ReceiveOrderNotification", $"Yeni sipariş alındı: {order.OrderNumber}");
+                try
+                {
+                    await _hubContext.Clients.All.SendAsync("ReceiveOrderNotification", $"Yeni sipariş alındı: {order.OrderNumber}");
+                    _logger.LogInformation("Bildirim gönderildi");
+                }
+                catch (Exception hubEx)
+                {
+                    _logger.LogError(hubEx, "Bildirim gönderilirken hata oluştu");
+                    // Bildirim hatası kritik değil, devam et
+                }
 
-                TempData["Success"] = "Siparişiniz başarıyla oluşturuldu.";
-                return RedirectToAction("OrderConfirmation", "Order", new { orderNumber = order.OrderNumber });
+                return Json(new { 
+                    success = true, 
+                    message = "Siparişiniz başarıyla oluşturuldu."
+                });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Sipariş oluşturulurken hata oluştu");
-                ModelState.AddModelError("", "Sipariş oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.");
-                model.CartItems = GetCartFromSession();
-                model.TotalAmount = model.CartItems.Sum(x => x.Price * x.Quantity);
-                return View(model);
-            }
-        }
-
-        public async Task<IActionResult> OrderConfirmation(string orderNumber)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(orderNumber))
+                _logger.LogError(ex, "Sipariş oluşturulurken kritik hata oluştu");
+                _logger.LogError($"Hata detayı: {ex.Message}");
+                if (ex.InnerException != null)
                 {
-                    return RedirectToAction("Index", "Home");
+                    _logger.LogError($"İç hata: {ex.InnerException.Message}");
                 }
-
-                var order = await _orderService.GetByOrderNumberAsync(orderNumber);
-                if (order == null)
-                {
-                    return RedirectToAction("Index", "Home");
-                }
-
-                return View(order);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Sipariş onay sayfası yüklenirken hata oluştu");
-                return RedirectToAction("Index", "Home");
+                return Json(new { success = false, message = "Sipariş oluşturulurken bir hata oluştu. Lütfen tekrar deneyin." });
             }
         }
     }

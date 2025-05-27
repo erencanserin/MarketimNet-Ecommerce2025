@@ -6,7 +6,7 @@ namespace marketimnet.Data.Abstract
     {
         Task<T> AddAsync(T entity);
         Task<T> UpdateAsync(T entity);
-        Task<int> DeleteAsync(T entity);
+        Task<bool> DeleteAsync(T entity);
         Task<T> GetByIdAsync(int id);
         Task<List<T>> GetAllAsync();
         Task<List<T>> GetAllAsync(Expression<Func<T, bool>> expression);

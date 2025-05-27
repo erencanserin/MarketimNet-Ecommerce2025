@@ -8,7 +8,8 @@
     <h2>Sipariş Onayı</h2>
     <div class="row">
         <div class="col-md-8">
-            <form asp-action="Checkout" method="post">
+            <form asp-action="Checkout" method="post" id="checkoutForm">
+                @Html.AntiForgeryToken()
                 <div class="card mb-4">
                     <div class="card-header">
                         <h5 class="mb-0">Teslimat Bilgileri</h5>
@@ -16,7 +17,7 @@
                     <div class="card-body">
                         <div class="mb-3">
                             <label asp-for="ShippingAddress" class="form-label"></label>
-                            <textarea asp-for="ShippingAddress" class="form-control" rows="3"></textarea>
+                            <textarea asp-for="ShippingAddress" class="form-control" rows="3" required></textarea>
                             <span asp-validation-for="ShippingAddress" class="text-danger"></span>
                         </div>
                         <div class="mb-3">
@@ -34,23 +35,23 @@
                     <div class="card-body">
                         <div class="mb-3">
                             <label asp-for="CardHolderName" class="form-label"></label>
-                            <input asp-for="CardHolderName" class="form-control" />
+                            <input asp-for="CardHolderName" class="form-control" required />
                             <span asp-validation-for="CardHolderName" class="text-danger"></span>
                         </div>
                         <div class="mb-3">
                             <label asp-for="CardNumber" class="form-label"></label>
-                            <input asp-for="CardNumber" class="form-control" id="cardNumber" />
+                            <input asp-for="CardNumber" class="form-control" id="cardNumber" maxlength="16" inputmode="numeric" pattern="\d{16}" oninput="this.value=this.value.replace(/[^\d]/g,'').substring(0,16);" required />
                             <span asp-validation-for="CardNumber" class="text-danger"></span>
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label asp-for="ExpiryDate" class="form-label"></label>
-                                <input asp-for="ExpiryDate" class="form-control" placeholder="AA/YY" />
+                                <input asp-for="ExpiryDate" class="form-control" placeholder="AA/YY" required />
                                 <span asp-validation-for="ExpiryDate" class="text-danger"></span>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label asp-for="Cvc" class="form-label"></label>
-                                <input asp-for="Cvc" class="form-control" maxlength="3" />
+                                <input asp-for="Cvc" class="form-control" maxlength="3" required />
                                 <span asp-validation-for="Cvc" class="text-danger"></span>
                             </div>
                         </div>
@@ -91,12 +92,36 @@
 </div>
 
 @section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
     <script>
-        // Kart numarası formatlaması
+        // Kart numarası kontrolü ve formatlaması
         document.getElementById('cardNumber').addEventListener('input', function (e) {
-            let value = e.target.value.replace(/\D/g, '');
-            value = value.replace(/(.{4})/g, '$1 ').trim();
+            // Sadece rakamları tut ve 16 karakterle sınırla
+            let value = e.target.value.replace(/\D/g, '').substring(0, 16);
             e.target.value = value;
+        });
+
+        // Yapıştırma işlemi için özel kontrol
+        document.getElementById('cardNumber').addEventListener('paste', function (e) {
+            e.preventDefault();
+            const pastedData = (e.originalEvent || e).clipboardData.getData('text');
+            this.value = pastedData.replace(/\D/g, '').substring(0, 16);
+        });
+
+        // Klavye girişi kontrolü
+        document.getElementById('cardNumber').addEventListener('keypress', function (e) {
+            // Sadece rakam girişine izin ver
+            if (!/^\d$/.test(e.key) && !e.key.match(/Backspace|Delete|ArrowLeft|ArrowRight|Tab/)) {
+                e.preventDefault();
+                return false;
+            }
+
+            // 16 haneden fazla girişi engelle
+            if (this.value.replace(/\D/g, '').length >= 16) {
+                e.preventDefault();
+                return false;
+            }
         });
 
         // Son kullanma tarihi formatlaması
@@ -106,6 +131,82 @@
                 value = value.substring(0, 2) + '/' + value.substring(2, 4);
             }
             e.target.value = value;
+        });
+
+        // Form submit işlemi
+        $('#checkoutForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            // Form validasyonunu kontrol et
+            if (!$(this).valid()) {
+                console.log('Form validation failed');
+                var validationErrors = [];
+                $('.field-validation-error').each(function() {
+                    validationErrors.push($(this).text());
+                });
+                console.log('Validation errors:', validationErrors);
+                
+                Swal.fire({
+                    title: 'Hata!',
+                    text: 'Lütfen tüm zorunlu alanları doldurun.',
+                    html: validationErrors.join('<br>'),
+                    icon: 'error',
+                    confirmButtonText: 'Tamam'
+                });
+                return false;
+            }
+            
+            const submitButton = $(this).find('button[type="submit"]');
+            submitButton.prop('disabled', true);
+            
+            const formData = $(this).serializeArray();
+            console.log('Sending form data:', formData);
+            
+            $.ajax({
+                url: $(this).attr('action'),
+                type: 'POST',
+                data: formData,
+                success: function(response) {
+                    console.log('Server response:', response);
+                    if (response.success) {
+                        Swal.fire({
+                            title: 'Başarılı!',
+                            text: response.message || 'Siparişiniz başarıyla alındı.',
+                            icon: 'success',
+                            confirmButtonText: 'Tamam'
+                        }).then(() => {
+                            $('#cartCount').text('0');
+                            window.location.href = '/';
+                        });
+                    } else {
+                        console.log('Server validation errors:', response.errors);
+                        let errorMessage = response.message;
+                        if (response.errors && response.errors.length > 0) {
+                            errorMessage = response.errors.join('<br>');
+                        }
+                        Swal.fire({
+                            title: 'Hata!',
+                            html: errorMessage || 'Lütfen tüm alanları doldurun.',
+                            icon: 'error',
+                            confirmButtonText: 'Tamam'
+                        });
+                        submitButton.prop('disabled', false);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Form submit error:', error);
+                    console.error('Status:', status);
+                    console.error('Response:', xhr.responseText);
+                    
+                    Swal.fire({
+                        title: 'Hata!',
+                        text: 'Sipariş işlemi sırasında bir hata oluştu.',
+                        icon: 'error',
+                        confirmButtonText: 'Tamam'
+                    });
+                    submitButton.prop('disabled', false);
+                }
+            });
         });
     </script>
 } 
