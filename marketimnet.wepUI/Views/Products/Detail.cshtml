@@ -4,6 +4,8 @@
     ViewData["Title"] = Model.Product.Name;
 }
 
+@Html.AntiForgeryToken()
+
 <div class="container py-4 products-container">
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-4">
@@ -98,27 +100,60 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            $('.add-to-cart').click(function () {
-                var productId = $(this).data('product-id');
-                $.post('/Cart/AddToCart', { productId: productId }, function (result) {
-                    if (result.success) {
-                        // Sepet sayısını güncelle
-                        $('#cartCount').text(result.cartCount);
-                        
-                        // Başarılı mesajı göster
-                        Swal.fire({
-                            title: 'Başarılı!',
-                            text: 'Ürün sepete eklendi.',
-                            icon: 'success',
-                            confirmButtonText: 'Tamam'
-                        });
-                    } else {
+            var token = $('input[name="__RequestVerificationToken"]').val();
+
+            $('.add-to-cart').click(function (e) {
+                e.preventDefault();
+                var button = $(this);
+                var productId = button.data('product-id');
+                
+                // Butonu devre dışı bırak
+                button.prop('disabled', true);
+                
+                $.ajax({
+                    url: '@Url.Action("AddToCart", "Cart")',
+                    type: 'POST',
+                    headers: {
+                        'RequestVerificationToken': token
+                    },
+                    data: {
+                        productId: productId,
+                        quantity: 1,
+                        __RequestVerificationToken: token
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            // Sepet sayısını güncelle
+                            $('#cartCount').text(response.cartCount);
+                            
+                            // Başarılı mesajı göster
+                            Swal.fire({
+                                title: 'Başarılı!',
+                                text: 'Ürün sepete eklendi.',
+                                icon: 'success',
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Hata!',
+                                text: response.message || 'Ürün sepete eklenirken bir hata oluştu.',
+                                icon: 'error',
+                                confirmButtonText: 'Tamam'
+                            });
+                        }
+                    },
+                    error: function () {
                         Swal.fire({
                             title: 'Hata!',
-                            text: result.message || 'Ürün sepete eklenirken bir hata oluştu.',
+                            text: 'Ürün sepete eklenirken bir hata oluştu.',
                             icon: 'error',
                             confirmButtonText: 'Tamam'
                         });
+                    },
+                    complete: function () {
+                        // Butonu tekrar aktif et
+                        button.prop('disabled', false);
                     }
                 });
             });

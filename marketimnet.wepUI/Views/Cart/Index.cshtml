@@ -4,6 +4,8 @@
     ViewData["Title"] = "Sepetim";
 }
 
+@Html.AntiForgeryToken()
+
 <div class="container py-5">
     <h2 class="mb-4">Alışveriş Sepeti</h2>
 
@@ -102,14 +104,19 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
+            var token = $('input[name="__RequestVerificationToken"]').val();
+
             function updateQuantity(productId, quantity) {
                 $.ajax({
                     url: '@Url.Action("UpdateQuantity", "Cart")',
                     type: 'POST',
+                    headers: {
+                        'RequestVerificationToken': token
+                    },
                     data: {
                         productId: productId,
                         quantity: quantity,
-                        __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                        __RequestVerificationToken: token
                     },
                     success: function (response) {
                         if (response.success) {
@@ -117,7 +124,7 @@
                         } else {
                             Swal.fire({
                                 title: 'Hata!',
-                                text: response.message,
+                                text: response.message || 'Miktar güncellenirken bir hata oluştu.',
                                 icon: 'error',
                                 confirmButtonText: 'Tamam'
                             });
@@ -154,7 +161,7 @@
 
             $('.quantity-input').change(function () {
                 var value = parseInt($(this).val());
-                if (value < 1) value = 1;
+                if (isNaN(value) || value < 1) value = 1;
                 if (value > 99) value = 99;
                 $(this).val(value);
                 var productId = $(this).closest('.cart-item').data('product-id');
@@ -177,9 +184,12 @@
                         $.ajax({
                             url: '@Url.Action("RemoveFromCart", "Cart")',
                             type: 'POST',
+                            headers: {
+                                'RequestVerificationToken': token
+                            },
                             data: {
                                 productId: productId,
-                                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                                __RequestVerificationToken: token
                             },
                             success: function (response) {
                                 if (response.success) {
@@ -187,7 +197,7 @@
                                 } else {
                                     Swal.fire({
                                         title: 'Hata!',
-                                        text: response.message,
+                                        text: response.message || 'Ürün kaldırılırken bir hata oluştu.',
                                         icon: 'error',
                                         confirmButtonText: 'Tamam'
                                     });

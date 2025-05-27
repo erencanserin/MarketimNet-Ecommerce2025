@@ -97,6 +97,7 @@ namespace marketimnet.wepUI.Controllers
 
                 var cartJson = JsonSerializer.Serialize(cart, options);
                 HttpContext.Session.SetString(CartSessionKey, cartJson);
+                _logger.LogInformation("Sepet session'a kaydedildi. Ürün sayısı: {Count}", cart.Count);
             }
             catch (Exception ex)
             {
@@ -149,36 +150,35 @@ namespace marketimnet.wepUI.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddToCart([FromBody] AddToCartModel model)
+        public async Task<IActionResult> AddToCart(int productId, int quantity = 1)
         {
             try
             {
-                if (!ModelState.IsValid)
-                {
-                    return Json(new { success = false, message = "Geçersiz istek parametreleri" });
-                }
+                _logger.LogInformation("AddToCart isteği alındı: ProductId={ProductId}, Quantity={Quantity}", 
+                    productId, quantity);
 
-                if (model.ProductId <= 0)
+                if (productId <= 0)
                 {
-                    _logger.LogWarning("Geçersiz ürün ID'si: {ProductId}", model.ProductId);
+                    _logger.LogWarning("Geçersiz ürün ID'si: {ProductId}", productId);
                     return Json(new { success = false, message = "Geçersiz ürün" });
                 }
 
-                if (model.Quantity <= 0)
+                if (quantity <= 0)
                 {
-                    _logger.LogWarning("Geçersiz miktar: {Quantity} for ProductId: {ProductId}", model.Quantity, model.ProductId);
+                    _logger.LogWarning("Geçersiz miktar: {Quantity} for ProductId: {ProductId}", quantity, productId);
                     return Json(new { success = false, message = "Geçersiz miktar" });
                 }
 
-                var cacheKey = $"Product_{model.ProductId}";
+                var cacheKey = $"Product_{productId}";
                 Product product;
 
                 if (!_cache.TryGetValue(cacheKey, out product))
                 {
-                    product = await _productService.GetByIdAsync(model.ProductId);
+                    _logger.LogInformation("Ürün cache'de bulunamadı, veritabanından alınıyor: {ProductId}", productId);
+                    product = await _productService.GetByIdAsync(productId);
                     if (product == null)
                     {
-                        _logger.LogWarning("Ürün bulunamadı: {ProductId}", model.ProductId);
+                        _logger.LogWarning("Ürün bulunamadı: {ProductId}", productId);
                         return Json(new { success = false, message = "Ürün bulunamadı" });
                     }
 
@@ -188,32 +188,36 @@ namespace marketimnet.wepUI.Controllers
                     _cache.Set(cacheKey, product, cacheEntryOptions);
                 }
 
+                _logger.LogInformation("Ürün bulundu: {ProductName} (ID: {ProductId})", product.Name, product.Id);
+
                 var cart = GetCartFromSession();
-                var cartItem = cart.FirstOrDefault(i => i.ProductId == model.ProductId);
+                var cartItem = cart.FirstOrDefault(i => i.ProductId == productId);
 
                 if (cartItem != null)
                 {
-                    cartItem.Quantity += model.Quantity;
+                    cartItem.Quantity += quantity;
                     cartItem.UpdatedDate = DateTime.Now;
+                    _logger.LogInformation("Mevcut ürün güncellendi. Yeni miktar: {Quantity}", cartItem.Quantity);
                 }
                 else
                 {
                     cart.Add(new CartItem
                     {
-                        ProductId = model.ProductId,
+                        ProductId = productId,
                         ProductName = product.Name,
                         Price = product.Price,
                         ImageUrl = product.ImageUrl,
-                        Quantity = model.Quantity,
+                        Quantity = quantity,
                         Product = product,
                         CreatedDate = DateTime.Now
                     });
+                    _logger.LogInformation("Yeni ürün sepete eklendi: {ProductName}", product.Name);
                 }
 
                 SaveCartToSession(cart);
 
                 var totalQuantity = cart.Sum(x => x.Quantity);
-                _logger.LogInformation("Ürün sepete eklendi: {ProductId}, Toplam Miktar: {TotalQuantity}", model.ProductId, totalQuantity);
+                _logger.LogInformation("Sepet güncellendi. Toplam ürün: {TotalQuantity}", totalQuantity);
 
                 // Send real-time notification
                 await _hubContext.Clients.All.SendAsync("ReceiveCartNotification", $"{product.Name} sepete eklendi", totalQuantity);
@@ -222,8 +226,8 @@ namespace marketimnet.wepUI.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Ürün sepete eklenirken hata oluştu: {ProductId}", model.ProductId);
-                return Json(new { success = false, message = "Ürün sepete eklenirken bir hata oluştu" });
+                _logger.LogError(ex, "Ürün sepete eklenirken hata oluştu: {ProductId}", productId);
+                return Json(new { success = false, message = "Ürün sepete eklenirken bir hata oluştu: " + ex.Message });
             }
         }
 
