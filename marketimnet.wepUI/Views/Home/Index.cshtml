@@ -182,7 +182,6 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            // Get the antiforgery token
             var token = $('input[name="__RequestVerificationToken"]').val();
 
             $('.add-to-cart').click(function (e) {
@@ -190,29 +189,29 @@
                 var button = $(this);
                 var productId = button.data('product-id');
                 
-                // Disable the button
+                // Butonu devre dışı bırak
                 button.prop('disabled', true);
                 
                 $.ajax({
                     url: '@Url.Action("AddToCart", "Cart")',
                     type: 'POST',
                     headers: {
-                        'X-CSRF-TOKEN': token
+                        'RequestVerificationToken': token
                     },
-                    data: JSON.stringify({ 
+                    data: {
                         productId: productId,
-                        quantity: 1
-                    }),
-                    contentType: 'application/json',
+                        quantity: 1,
+                        __RequestVerificationToken: token
+                    },
                     success: function (response) {
                         if (response.success) {
-                            // Update cart count in navbar
+                            // Sepet sayısını güncelle
                             $('#cartCount').text(response.cartCount);
                             
-                            // Show success message
+                            // Başarılı mesajı göster
                             Swal.fire({
                                 title: 'Başarılı!',
-                                text: response.message,
+                                text: 'Ürün sepete eklendi.',
                                 icon: 'success',
                                 showConfirmButton: false,
                                 timer: 1500
@@ -226,11 +225,7 @@
                             });
                         }
                     },
-                    error: function (xhr, status, error) {
-                        console.error('Hata:', error);
-                        console.error('Status:', status);
-                        console.error('Response:', xhr.responseText);
-                        
+                    error: function () {
                         Swal.fire({
                             title: 'Hata!',
                             text: 'Ürün sepete eklenirken bir hata oluştu.',
@@ -239,7 +234,7 @@
                         });
                     },
                     complete: function () {
-                        // Re-enable the button
+                        // Butonu tekrar aktif et
                         button.prop('disabled', false);
                     }
                 });
