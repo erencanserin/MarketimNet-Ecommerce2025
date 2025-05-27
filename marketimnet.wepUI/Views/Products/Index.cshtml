@@ -71,26 +71,43 @@
                 @foreach (var product in Model.Products)
                 {
                     <div class="col">
-                        <div class="card h-100">
-                            <img src="@(string.IsNullOrEmpty(product.ImageUrl) ? "/img/no-image.png" : product.ImageUrl)" 
-                                 class="card-img-top" alt="@product.Name">
-                            <div class="card-body">
-                                <h5 class="card-title">@product.Name</h5>
-                                <p class="card-text">@product.Category?.Name</p>
-                                <p class="card-text">
-                                    @if (product.DiscountedPrice.HasValue)
+                        <div class="card h-100 product-card">
+                            <a href="@Url.Action("Detail", new { id = product.Id })" class="product-link">
+                                <div class="card-img-container">
+                                    @if (!string.IsNullOrEmpty(product.ImageUrl))
                                     {
-                                        <span class="text-decoration-line-through">@product.Price.ToString("C")</span>
-                                        <span class="text-danger">@product.DiscountedPrice.Value.ToString("C")</span>
+                                        <img src="@product.ImageUrl" class="card-img-top" alt="@product.Name">
                                     }
                                     else
                                     {
-                                        <span>@product.Price.ToString("C")</span>
+                                        <img src="/img/no-image.png" class="card-img-top" alt="@product.Name">
                                     }
-                                </p>
-                                <a href="@Url.Action("Detail", new { id = product.Id })" class="btn btn-primary">
-                                    Detay
-                                </a>
+                                </div>
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title">@product.Name</h5>
+                                    <p class="card-text text-muted">@product.Category?.Name</p>
+                                    <div class="mt-auto">
+                                        @if (product.DiscountedPrice.HasValue)
+                                        {
+                                            <p class="card-text mb-1">
+                                                <span class="text-decoration-line-through text-muted">@product.Price.ToString("C")</span>
+                                                <span class="text-danger fs-5 fw-bold">@product.DiscountedPrice.Value.ToString("C")</span>
+                                            </p>
+                                            <p class="card-text text-success">
+                                                <small>%@(Math.Round((1 - product.DiscountedPrice.Value / product.Price) * 100)) indirim</small>
+                                            </p>
+                                        }
+                                        else
+                                        {
+                                            <p class="card-text fs-5 fw-bold">@product.Price.ToString("C")</p>
+                                        }
+                                    </div>
+                                </div>
+                            </a>
+                            <div class="card-footer bg-transparent border-0 p-3">
+                                <button class="btn btn-primary w-100 add-to-cart" data-product-id="@product.Id">
+                                    <i class="fas fa-shopping-cart me-2"></i>Sepete Ekle
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -181,4 +198,92 @@
             });
         });
     </script>
-} 
+}
+
+<style>
+    .product-link {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+
+    .product-link:hover {
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .product-card {
+        transition: transform 0.3s, box-shadow 0.3s;
+        border: none;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        cursor: pointer;
+    }
+
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+    .card-img-container {
+        position: relative;
+        padding-top: 100%; /* 1:1 Aspect Ratio */
+        overflow: hidden;
+        background-color: #f8f9fa;
+    }
+
+    .card-img-top {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        padding: 1rem;
+    }
+
+    .add-to-cart {
+        transition: all 0.3s ease;
+        padding: 1rem;
+        font-size: 1.1rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        height: 3.5rem;
+    }
+
+    .add-to-cart i {
+        font-size: 1.25rem;
+    }
+
+    .add-to-cart:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(13, 110, 253, 0.2);
+    }
+
+    .card-footer {
+        background: transparent;
+        border-top: none;
+    }
+
+    .card-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 1.25rem;
+    }
+
+    .card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+</style> 
