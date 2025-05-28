@@ -36,105 +36,278 @@
     </div>
 
     <div class="row">
-        <!-- Kategoriler -->
-        <div class="col-lg-3">
-            <h5 class="mb-4">Kategoriler</h5>
-            <div class="list-group">
-                <a href="@Url.Action("Index", new { search = Model.SearchTerm })" 
-                   class="list-group-item list-group-item-action @(Model.CurrentCategory == null ? "active" : "")">
-                    Tüm Kategoriler
-                </a>
-                @foreach (var category in Model.Categories)
-                {
-                    var isActive = Model.CurrentCategory?.Id == category.Id;
-                    <a href="@Url.Action("Index", new { categoryId = category.Id, search = Model.SearchTerm })" 
-                       class="list-group-item list-group-item-action @(isActive ? "active" : "")">
-                        @category.Name
-                    </a>
-                }
+        <!-- Filtreler -->
+        <div class="col-md-3 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Kategoriler</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <a href="@Url.Action("Index")" class="list-group-item list-group-item-action @(Model.CurrentCategory == null && !Model.IsDiscountedPage ? "active" : "")">
+                            Tüm Ürünler
+                        </a>
+                        @foreach (var category in Model.Categories)
+                        {
+                            <a href="@Url.Action("Index", new { categoryId = category.Id })" 
+                               class="list-group-item list-group-item-action @(Model.CurrentCategory?.Id == category.Id ? "active" : "")">
+                                @category.Name
+                            </a>
+                        }
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Ürünler -->
-        <div class="col-lg-9">
-            <!-- Arama -->
-            <div class="mb-4">
-                <form method="get" class="d-flex">
-                    <input type="hidden" name="categoryId" value="@Model.CurrentCategory?.Id" />
-                    <input type="text" name="search" value="@Model.SearchTerm" class="form-control me-2" placeholder="Ürün ara..." />
-                    <button type="submit" class="btn btn-primary">Ara</button>
-                </form>
-            </div>
-
-            <!-- Ürün Listesi -->
-            <div class="row row-cols-1 row-cols-md-3 g-4">
-                @foreach (var product in Model.Products)
+        <!-- Ürün Listesi -->
+        <div class="col-md-9">
+            <div class="products-wrapper">
+                @if (Model.Products.Any())
                 {
-                    <div class="col">
-                        <div class="card h-100 product-card">
-                            <a href="@Url.Action("Detail", new { id = product.Id })" class="product-link">
-                                <div class="card-img-container">
-                                    @if (!string.IsNullOrEmpty(product.ImageUrl))
-                                    {
-                                        <img src="@product.ImageUrl" class="card-img-top" alt="@product.Name">
-                                    }
-                                    else
-                                    {
-                                        <img src="/img/no-image.png" class="card-img-top" alt="@product.Name">
-                                    }
-                                </div>
-                                <div class="card-body d-flex flex-column">
-                                    <h5 class="card-title">@product.Name</h5>
-                                    <p class="card-text text-muted">@product.Category?.Name</p>
-                                    <div class="mt-auto">
-                                        @if (product.DiscountedPrice.HasValue)
-                                        {
-                                            <p class="card-text mb-1">
-                                                <span class="text-decoration-line-through text-muted">@product.Price.ToString("C")</span>
-                                                <span class="text-danger fs-5 fw-bold">@product.DiscountedPrice.Value.ToString("C")</span>
-                                            </p>
-                                            <p class="card-text text-success">
-                                                <small>%@(Math.Round((1 - product.DiscountedPrice.Value / product.Price) * 100)) indirim</small>
-                                            </p>
-                                        }
-                                        else
-                                        {
-                                            <p class="card-text fs-5 fw-bold">@product.Price.ToString("C")</p>
-                                        }
+                    <div class="products-grid">
+                        @foreach (var product in Model.Products)
+                        {
+                            <div class="product-item">
+                                <article class="card h-100 product-card">
+                                    <a href="@Url.Action("Detail", new { id = product.Id })" class="product-link">
+                                        <div class="card-img-container">
+                                            @if (!string.IsNullOrEmpty(product.ImageUrl))
+                                            {
+                                                <img src="@product.ImageUrl" class="card-img-top" alt="@product.Name">
+                                            }
+                                            else
+                                            {
+                                                <img src="/img/no-image.png" class="card-img-top" alt="@product.Name">
+                                            }
+                                        </div>
+                                        <div class="card-body d-flex flex-column">
+                                            <div class="flex-grow-1">
+                                                <h5 class="card-title">@product.Name</h5>
+                                                <p class="card-category text-muted mb-2">@(product.Category?.Name ?? "Genel")</p>
+                                                <p class="card-text product-description">
+                                                    @(string.IsNullOrEmpty(product.Description)
+                                                        ? "Ürün açıklaması bulunmamaktadır."
+                                                        : (product.Description.Length > 100
+                                                            ? product.Description.Substring(0, 97) + "..."
+                                                            : product.Description))
+                                                </p>
+                                            </div>
+                                            <div class="mt-auto">
+                                                @if (product.DiscountedPrice.HasValue)
+                                                {
+                                                    <p class="card-text mb-1">
+                                                        <span class="text-decoration-line-through text-muted">@product.Price.ToString("C")</span>
+                                                        <span class="text-danger fs-5 fw-bold">@product.DiscountedPrice.Value.ToString("C")</span>
+                                                    </p>
+                                                    <p class="card-text text-success">
+                                                        <small>%@(Math.Round((1 - product.DiscountedPrice.Value / product.Price) * 100)) indirim</small>
+                                                    </p>
+                                                }
+                                                else
+                                                {
+                                                    <p class="card-text product-price">@product.Price.ToString("C")</p>
+                                                }
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <div class="card-footer bg-transparent border-0 p-3">
+                                        <button class="btn btn-primary w-100 add-to-cart" data-product-id="@product.Id">
+                                            <i class="fas fa-shopping-cart me-2"></i>Sepete Ekle
+                                        </button>
                                     </div>
-                                </div>
-                            </a>
-                            <div class="card-footer bg-transparent border-0 p-3">
-                                <button class="btn btn-primary w-100 add-to-cart" data-product-id="@product.Id">
-                                    <i class="fas fa-shopping-cart me-2"></i>Sepete Ekle
-                                </button>
+                                </article>
                             </div>
+                        }
+                    </div>
+
+                    @if (Model.TotalPages > 1)
+                    {
+                        <div class="d-flex justify-content-center mt-4">
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination">
+                                    @for (int i = 1; i <= Model.TotalPages; i++)
+                                    {
+                                        <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                                            <a class="page-link" href="@Url.Action("Index", new { page = i, categoryId = Model.CurrentCategory?.Id, search = Model.SearchTerm })">@i</a>
+                                        </li>
+                                    }
+                                </ul>
+                            </nav>
                         </div>
+                    }
+                }
+                else
+                {
+                    <div class="alert alert-info text-center">
+                        <i class="fas fa-info-circle me-2"></i>Ürün bulunamadı.
                     </div>
                 }
             </div>
-
-            <!-- Sayfalama -->
-            @if (Model.TotalPages > 1)
-            {
-                <nav class="mt-4">
-                    <ul class="pagination justify-content-center">
-                        @for (int i = 1; i <= Model.TotalPages; i++)
-                        {
-                            <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
-                                <a class="page-link" href="@Url.Action("Index", new { categoryId = Model.CurrentCategory?.Id, search = Model.SearchTerm, page = i })">
-                                    @i
-                                </a>
-                            </li>
-                        }
-                    </ul>
-                </nav>
-            }
         </div>
     </div>
 </div>
 
-<hr class="footer-divider my-8">
+<style>
+    .products-wrapper {
+        width: 100%;
+        padding: 0;
+        margin: 0;
+    }
+
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        width: 100%;
+    }
+
+    .product-item {
+        width: 100%;
+        min-width: 0;
+        margin: 0;
+        padding: 0;
+    }
+
+    .product-link {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        height: 100%;
+    }
+
+    .product-link:hover {
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .product-card {
+        transition: transform 0.3s, box-shadow 0.3s;
+        border: none;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        cursor: pointer;
+    }
+
+    .card-img-container {
+        position: relative;
+        padding-top: 75%;
+        overflow: hidden;
+        background-color: #f8f9fa;
+    }
+
+    .card-img-top {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        padding: 0.5rem;
+        transition: transform 0.3s ease;
+    }
+
+    .product-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+    .product-card:hover .card-img-top {
+        transform: scale(1.05);
+    }
+
+    .product-description {
+        font-size: 0.875rem;
+        color: #6c757d;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        height: 3rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .card-body {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        padding: 0.75rem;
+    }
+
+    .product-price {
+        color: #0d6efd;
+        font-weight: 600;
+        font-size: 1.25rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .card-category {
+        font-size: 0.8rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .add-to-cart {
+        transition: all 0.3s ease;
+        padding: 0.75rem;
+        font-size: 1rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        height: 2.75rem;
+    }
+
+    .add-to-cart i {
+        font-size: 1.1rem;
+    }
+
+    .add-to-cart:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(13, 110, 253, 0.2);
+    }
+
+    .add-to-cart:active {
+        transform: translateY(0);
+    }
+
+    .add-to-cart:disabled {
+        background-color: #ccc;
+        border-color: #ccc;
+        transform: none;
+        box-shadow: none;
+    }
+
+    .card-footer {
+        margin-top: auto;
+        background: transparent;
+        padding: 0.75rem;
+        border: none;
+    }
+
+    @@media (max-width: 1200px) {
+        .products-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .products-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .products-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
 
 @section Scripts {
     <script>
@@ -146,7 +319,6 @@
                 var button = $(this);
                 var productId = button.data('product-id');
                 
-                // Butonu devre dışı bırak
                 button.prop('disabled', true);
                 
                 $.ajax({
@@ -162,10 +334,8 @@
                     },
                     success: function (response) {
                         if (response.success) {
-                            // Sepet sayısını güncelle
                             $('#cartCount').text(response.cartCount);
                             
-                            // Başarılı mesajı göster
                             Swal.fire({
                                 title: 'Başarılı!',
                                 text: 'Ürün sepete eklendi.',
@@ -191,99 +361,10 @@
                         });
                     },
                     complete: function () {
-                        // Butonu tekrar aktif et
                         button.prop('disabled', false);
                     }
                 });
             });
         });
     </script>
-}
-
-<style>
-    .product-link {
-        text-decoration: none;
-        color: inherit;
-        display: block;
-    }
-
-    .product-link:hover {
-        text-decoration: none;
-        color: inherit;
-    }
-
-    .product-card {
-        transition: transform 0.3s, box-shadow 0.3s;
-        border: none;
-        border-radius: 0.5rem;
-        overflow: hidden;
-        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        cursor: pointer;
-    }
-
-    .product-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-    }
-
-    .card-img-container {
-        position: relative;
-        padding-top: 100%; /* 1:1 Aspect Ratio */
-        overflow: hidden;
-        background-color: #f8f9fa;
-    }
-
-    .card-img-top {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        padding: 1rem;
-    }
-
-    .add-to-cart {
-        transition: all 0.3s ease;
-        padding: 1rem;
-        font-size: 1.1rem;
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        height: 3.5rem;
-    }
-
-    .add-to-cart i {
-        font-size: 1.25rem;
-    }
-
-    .add-to-cart:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(13, 110, 253, 0.2);
-    }
-
-    .card-footer {
-        background: transparent;
-        border-top: none;
-    }
-
-    .card-body {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        padding: 1.25rem;
-    }
-
-    .card-title {
-        font-size: 1.1rem;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-    }
-</style> 
+} 

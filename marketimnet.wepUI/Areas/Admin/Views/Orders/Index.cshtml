@@ -26,6 +26,8 @@
                         <tr>
                             <th>Sipariş No</th>
                             <th>Müşteri</th>
+                            <th>E-posta</th>
+                            <th>Telefon</th>
                             <th>Tarih</th>
                             <th>Tutar</th>
                             <th>Durum</th>
@@ -38,6 +40,8 @@
                             <tr>
                                 <td>@order.OrderNumber</td>
                                 <td>@order.FullName</td>
+                                <td>@order.Email</td>
+                                <td>@order.Phone</td>
                                 <td>@order.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
                                 <td>@order.TotalAmount.ToString("C2")</td>
                                 <td>
@@ -68,7 +72,7 @@
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Turkish.json"
                 },
-                "order": [[2, "desc"]]
+                "order": [[4, "desc"]]
             });
         });
     </script>

@@ -367,52 +367,16 @@ namespace marketimnet.wepUI.Controllers
 
                 _logger.LogInformation($"Sepet ürün sayısı: {cart.Count}, Toplam tutar: {cart.Sum(x => x.Price * x.Quantity)}");
 
-                // Model validasyonu
-                if (!ModelState.IsValid)
-                {
-                    _logger.LogWarning("Model validation failed");
-                    foreach (var modelState in ModelState.Values)
-                    {
-                        foreach (var error in modelState.Errors)
-                        {
-                            _logger.LogWarning($"Validation error: {error.ErrorMessage}");
-                        }
-                    }
-
-                    var errors = ModelState.Values
-                        .SelectMany(v => v.Errors)
-                        .Select(e => e.ErrorMessage)
-                        .ToList();
-
-                    return Json(new { success = false, message = "Lütfen tüm alanları doldurun.", errors = errors });
-                }
-
-                // Kredi kartı doğrulama ve ödeme işlemi burada yapılacak
-                // Şimdilik sadece başarılı kabul ediyoruz
-                bool paymentSuccess = true;
-
-                if (!paymentSuccess)
-                {
-                    return Json(new { success = false, message = "Ödeme işlemi başarısız oldu. Lütfen tekrar deneyin." });
-                }
-
-                _logger.LogInformation("Sipariş oluşturuluyor...");
-
-                // Sipariş oluştur
                 var order = new Order
                 {
-                    OrderNumber = Guid.NewGuid().ToString("N").Substring(0, 10).ToUpper(),
-                    OrderDate = DateTime.Now,
-                    Status = "Beklemede",
                     FullName = model.CardHolderName,
+                    Email = model.Email,
+                    Phone = model.PhoneNumber,
                     Address = model.ShippingAddress,
                     Note = model.Notes,
                     TotalAmount = cart.Sum(x => x.Price * x.Quantity),
-                    Email = null, // Opsiyonel alan
-                    Phone = null, // Opsiyonel alan
-                    City = null, // Opsiyonel alan
-                    District = null, // Opsiyonel alan
-                    ZipCode = null, // Opsiyonel alan
+                    OrderDate = DateTime.Now,
+                    Status = "Beklemede",
                     OrderItems = cart.Select(item => new OrderItem
                     {
                         ProductId = item.ProductId,
@@ -423,50 +387,15 @@ namespace marketimnet.wepUI.Controllers
                     }).ToList()
                 };
 
-                _logger.LogInformation($"Sipariş nesnesi oluşturuldu: OrderNumber={order.OrderNumber}, TotalAmount={order.TotalAmount}");
-
-                try
-                {
-                    // Siparişi kaydet
-                    await _orderService.AddAsync(order);
-                    _logger.LogInformation($"Sipariş başarıyla kaydedildi: {order.OrderNumber}");
-                }
-                catch (Exception dbEx)
-                {
-                    _logger.LogError(dbEx, "Sipariş veritabanına kaydedilirken hata oluştu");
-                    throw; // Üst catch bloğuna yönlendir
-                }
-
-                // Sepeti temizle
+                await _orderService.AddAsync(order);
                 HttpContext.Session.Remove(CartSessionKey);
-                _logger.LogInformation("Sepet temizlendi");
 
-                // Bildirim gönder
-                try
-                {
-                    await _hubContext.Clients.All.SendAsync("ReceiveOrderNotification", $"Yeni sipariş alındı: {order.OrderNumber}");
-                    _logger.LogInformation("Bildirim gönderildi");
-                }
-                catch (Exception hubEx)
-                {
-                    _logger.LogError(hubEx, "Bildirim gönderilirken hata oluştu");
-                    // Bildirim hatası kritik değil, devam et
-                }
-
-                return Json(new { 
-                    success = true, 
-                    message = "Siparişiniz başarıyla oluşturuldu."
-                });
+                return Json(new { success = true, message = "Siparişiniz başarıyla alındı." });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Sipariş oluşturulurken kritik hata oluştu");
-                _logger.LogError($"Hata detayı: {ex.Message}");
-                if (ex.InnerException != null)
-                {
-                    _logger.LogError($"İç hata: {ex.InnerException.Message}");
-                }
-                return Json(new { success = false, message = "Sipariş oluşturulurken bir hata oluştu. Lütfen tekrar deneyin." });
+                _logger.LogError(ex, "Sipariş oluşturulurken hata oluştu");
+                return Json(new { success = false, message = "Sipariş işlemi sırasında bir hata oluştu." });
             }
         }
     }

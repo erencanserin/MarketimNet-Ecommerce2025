@@ -16,6 +16,16 @@
                     </div>
                     <div class="card-body">
                         <div class="mb-3">
+                            <label asp-for="PhoneNumber" class="form-label"></label>
+                            <input asp-for="PhoneNumber" class="form-control" placeholder="5XX XXX XXXX" required />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label"></label>
+                            <input asp-for="Email" class="form-control" placeholder="ornek@email.com" required />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
                             <label asp-for="ShippingAddress" class="form-label"></label>
                             <textarea asp-for="ShippingAddress" class="form-control" rows="3" required></textarea>
                             <span asp-validation-for="ShippingAddress" class="text-danger"></span>
@@ -95,6 +105,12 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     
     <script>
+        // Telefon numarası formatlaması
+        document.querySelector('[name="PhoneNumber"]').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '').substring(0, 10);
+            e.target.value = value;
+        });
+
         // Kart numarası kontrolü ve formatlaması
         document.getElementById('cardNumber').addEventListener('input', function (e) {
             // Sadece rakamları tut ve 16 karakterle sınırla

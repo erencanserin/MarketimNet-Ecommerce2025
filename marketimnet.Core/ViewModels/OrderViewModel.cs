@@ -9,6 +9,16 @@ namespace marketimnet.Core.ViewModels
         public List<CartItem> CartItems { get; set; } = new List<CartItem>();
         public decimal TotalAmount { get; set; }
 
+        [Required(ErrorMessage = "Telefon numarası zorunludur")]
+        [Display(Name = "Telefon Numarası")]
+        [RegularExpression(@"^[0-9]{10}$", ErrorMessage = "Geçerli bir telefon numarası giriniz (5XX XXX XXXX)")]
+        public string PhoneNumber { get; set; }
+
+        [Required(ErrorMessage = "E-posta adresi zorunludur")]
+        [Display(Name = "E-posta Adresi")]
+        [EmailAddress(ErrorMessage = "Geçerli bir e-posta adresi giriniz")]
+        public string Email { get; set; }
+
         [Required(ErrorMessage = "Teslimat adresi zorunludur")]
         [Display(Name = "Teslimat Adresi")]
         public string ShippingAddress { get; set; }

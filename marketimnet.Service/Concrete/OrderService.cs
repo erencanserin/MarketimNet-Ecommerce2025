@@ -175,6 +175,8 @@ namespace marketimnet.Service.Concrete
                     Id = o.Id,
                     OrderNumber = o.OrderNumber,
                     FullName = o.FullName,
+                    Email = o.Email,
+                    Phone = o.Phone,
                     OrderDate = o.OrderDate,
                     TotalAmount = o.TotalAmount,
                     Status = o.Status
