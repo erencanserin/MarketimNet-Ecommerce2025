@@ -1,0 +1,168 @@
+@{
+    ViewData["Title"] = "İade Şartları";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">İade Şartları ve Koşulları</h1>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title text-primary mb-3">İade Süresi</h5>
+                    <p>Tüketicinin ürünü teslim aldığı tarihten itibaren 14 gün içinde herhangi bir gerekçe göstermeksizin ve cezai şart ödemeksizin sözleşmeden cayma hakkı bulunmaktadır.</p>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title text-primary mb-3">İade Koşulları</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Ürün kullanılmamış, yıkanmamış ve orijinal etiketleri çıkarılmamış olmalıdır.
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Ürün orijinal ambalajı ile birlikte gönderilmelidir.
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Ürün faturası iade paketi içerisinde yer almalıdır.
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-check text-success me-2"></i>
+                            Ürün üzerinde kullanımdan kaynaklanan deformasyon, yıpranma olmamalıdır.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title text-primary mb-3">İade Süreci</h5>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-badge bg-primary">1</div>
+                            <div class="timeline-content">
+                                <h6>İade Talebi Oluşturma</h6>
+                                <p>"Siparişlerim" sayfasından ilgili ürün için iade talebi oluşturun.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-badge bg-primary">2</div>
+                            <div class="timeline-content">
+                                <h6>Ürünü Paketleme</h6>
+                                <p>Ürünü orijinal ambalajı ve faturası ile birlikte paketleyin.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-badge bg-primary">3</div>
+                            <div class="timeline-content">
+                                <h6>Kargo Gönderimi</h6>
+                                <p>Ürünü anlaşmalı kargo firması ile ücretsiz olarak gönderebilirsiniz.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-badge bg-primary">4</div>
+                            <div class="timeline-content">
+                                <h6>İade İnceleme</h6>
+                                <p>İade edilen ürün depomuzda incelenir ve uygunluğu kontrol edilir.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-badge bg-success">5</div>
+                            <div class="timeline-content">
+                                <h6>İade Onayı ve Ödeme</h6>
+                                <p>İade onaylandıktan sonra ödemeniz 3 iş günü içinde iade edilir.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title text-primary mb-3">İade Edilemeyecek Ürünler</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <i class="fas fa-times text-danger me-2"></i>
+                            Kullanılmış, yıkanmış veya etiketi çıkarılmış ürünler
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-times text-danger me-2"></i>
+                            Özel olarak üretilmiş veya kişiselleştirilmiş ürünler
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-times text-danger me-2"></i>
+                            Hijyen açısından iade edilemeyecek ürünler
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="alert alert-info">
+                <h5 class="alert-heading">
+                    <i class="fas fa-info-circle me-2"></i>Önemli Bilgi
+                </h5>
+                <p class="mb-0">
+                    İade süreciyle ilgili herhangi bir sorunuz olması durumunda müşteri hizmetlerimiz ile iletişime geçebilirsiniz.
+                    <a href="@Url.Action("Contact", "Home")" class="alert-link">İletişim formu</a> üzerinden bize ulaşın.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .timeline {
+        position: relative;
+        padding: 20px 0;
+    }
+
+    .timeline-item {
+        position: relative;
+        padding-left: 50px;
+        margin-bottom: 30px;
+    }
+
+    .timeline-badge {
+        position: absolute;
+        left: 0;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 36px;
+        color: white;
+        font-weight: bold;
+    }
+
+    .timeline-content {
+        padding: 0 15px;
+    }
+
+    .timeline-content h6 {
+        margin-bottom: 5px;
+        color: #333;
+    }
+
+    .timeline-content p {
+        color: #666;
+        margin-bottom: 0;
+    }
+
+    .list-group-item {
+        border: none;
+        padding: 0.75rem 0;
+    }
+
+    .card {
+        border: none;
+        box-shadow: 0 0 15px rgba(0,0,0,0.05);
+    }
+
+    .card-title {
+        font-size: 1.25rem;
+    }
+</style> 

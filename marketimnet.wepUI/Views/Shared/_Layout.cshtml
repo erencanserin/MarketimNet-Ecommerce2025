@@ -262,26 +262,24 @@
                         <img src="~/img/logo.svg" alt="Marketimnet" class="mb-2">
                         <p class="text-muted mb-2">Güvenli alışverişin adresi</p>
                         <div class="social-links">
-                            <a href="#" class="me-2"><i class="fab fa-facebook"></i></a>
-                            <a href="#" class="me-2"><i class="fab fa-instagram"></i></a>
-                            <a href="#" class="me-2"><i class="fab fa-twitter"></i></a>
+                            <a href="https://github.com/erencanserin" target="_blank" class="me-2"><i class="fab fa-github"></i></a>
+                            <a href="https://www.linkedin.com/in/erencan-serin/" target="_blank" class="me-2"><i class="fab fa-linkedin"></i></a>
                         </div>
                     </div>
                 </div>
                 <div class="col-6 col-md-2 mb-2">
                     <h6>Kurumsal</h6>
                     <ul class="nav flex-column">
-                        <li class="nav-item"><a href="#" class="nav-link p-0 text-muted">Hakkımızda</a></li>
-                        <li class="nav-item"><a href="#" class="nav-link p-0 text-muted">Kariyer</a></li>
-                        <li class="nav-item"><a href="#" class="nav-link p-0 text-muted">İletişim</a></li>
+                        <li class="nav-item"><a href="@Url.Action("About", "Home")" class="nav-link p-0 text-muted">Hakkımızda</a></li>
+                        <li class="nav-item"><a href="@Url.Action("Contact", "Home")" class="nav-link p-0 text-muted">İletişim</a></li>
                     </ul>
                 </div>
                 <div class="col-6 col-md-2 mb-2">
                     <h6>Yardım</h6>
                     <ul class="nav flex-column">
-                        <li class="nav-item"><a href="#" class="nav-link p-0 text-muted">Sıkça Sorulan Sorular</a></li>
+                        <li class="nav-item"><a href="@Url.Action("Faq", "Help")" class="nav-link p-0 text-muted">Sıkça Sorulan Sorular</a></li>
                         <li class="nav-item"><a href="@Url.Action("Track", "Shipment")" class="nav-link p-0 text-muted">Kargo Takip</a></li>
-                        <li class="nav-item"><a href="#" class="nav-link p-0 text-muted">İade Şartları</a></li>
+                        <li class="nav-item"><a href="@Url.Action("ReturnPolicy", "Help")" class="nav-link p-0 text-muted">İade Şartları</a></li>
                     </ul>
                 </div>
             </div>

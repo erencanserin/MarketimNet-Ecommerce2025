@@ -1,0 +1,187 @@
+@{
+    ViewData["Title"] = "İletişim";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h1 class="display-4 mb-4">İletişim</h1>
+                    <p class="lead">Bizimle iletişime geçmek için aşağıdaki formu kullanabilir veya iletişim bilgilerimizden bize ulaşabilirsiniz.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- İletişim Formu -->
+        <div class="col-md-8 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h4 class="mb-4">İletişim Formu</h4>
+                    <form id="contactForm">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="name" placeholder="Adınız Soyadınız" required>
+                                    <label for="name">Adınız Soyadınız</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="email" class="form-control" id="email" placeholder="E-posta Adresiniz" required>
+                                    <label for="email">E-posta Adresiniz</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="subject" placeholder="Konu" required>
+                                    <label for="subject">Konu</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating mb-3">
+                                    <textarea class="form-control" id="message" style="height: 150px" placeholder="Mesajınız" required></textarea>
+                                    <label for="message">Mesajınız</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane me-2"></i>Gönder
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- İletişim Bilgileri -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h4 class="mb-4">İletişim Bilgileri</h4>
+                    <div class="d-flex mb-3">
+                        <i class="fas fa-map-marker-alt text-primary fa-2x me-3"></i>
+                        <div>
+                            <h6 class="mb-1">Adres</h6>
+                            <p class="mb-0">Atatürk Mah. İstiklal Cad. No:123<br>Melikgazi/Kayseri</p>
+                        </div>
+                    </div>
+                    <div class="d-flex mb-3">
+                        <i class="fas fa-phone-alt text-primary fa-2x me-3"></i>
+                        <div>
+                            <h6 class="mb-1">Telefon</h6>
+                            <p class="mb-0">
+                                <a href="tel:+905555555555" class="text-decoration-none">0555 555 55 55</a>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="d-flex mb-3">
+                        <i class="fas fa-envelope text-primary fa-2x me-3"></i>
+                        <div>
+                            <h6 class="mb-1">E-posta</h6>
+                            <p class="mb-0">
+                                <a href="mailto:info@marketimnet.com" class="text-decoration-none">info@marketimnet.com</a>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="d-flex">
+                        <i class="fas fa-clock text-primary fa-2x me-3"></i>
+                        <div>
+                            <h6 class="mb-1">Çalışma Saatleri</h6>
+                            <p class="mb-0">Pazartesi - Cumartesi: 09:00 - 18:00<br>Pazar: Kapalı</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sosyal Medya -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h4 class="mb-4">Sosyal Medya</h4>
+                    <div class="d-flex justify-content-around">
+                        <a href="https://github.com/erencanserin" target="_blank" class="text-decoration-none">
+                            <i class="fab fa-github fa-2x"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/in/erencan-serin/" target="_blank" class="text-decoration-none">
+                            <i class="fab fa-linkedin fa-2x text-primary"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Harita -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50139.917105651715!2d35.482145895363666!3d38.722911095865004!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x152b6851ba3883c5%3A0x1e6d7a8ce5bb2d04!2sMelikgazi%2C%20Kayseri!5e0!3m2!1str!2str!4v1709847122650!5m2!1str!2str" 
+                            width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#contactForm').on('submit', function(e) {
+                e.preventDefault();
+                
+                // Form verilerini al
+                var formData = {
+                    name: $('#name').val(),
+                    email: $('#email').val(),
+                    subject: $('#subject').val(),
+                    message: $('#message').val()
+                };
+                
+                // Başarılı mesajı göster
+                Swal.fire({
+                    title: 'Teşekkürler!',
+                    text: 'Mesajınız başarıyla gönderildi. En kısa sürede size dönüş yapacağız.',
+                    icon: 'success',
+                    confirmButtonText: 'Tamam'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Formu temizle
+                        $('#contactForm')[0].reset();
+                    }
+                });
+            });
+        });
+    </script>
+}
+
+<style>
+    .form-floating > .form-control:focus ~ label,
+    .form-floating > .form-control:not(:placeholder-shown) ~ label {
+        color: #0d6efd;
+    }
+    
+    .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    
+    .social-links a {
+        transition: transform 0.3s ease;
+    }
+    
+    .social-links a:hover {
+        transform: translateY(-5px);
+    }
+    
+    .card {
+        transition: transform 0.3s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+    }
+</style> 

@@ -1,0 +1,138 @@
+@{
+    ViewData["Title"] = "Sıkça Sorulan Sorular";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">Sıkça Sorulan Sorular</h1>
+
+            <div class="accordion" id="faqAccordion">
+                <!-- Sipariş ve Teslimat -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                            Sipariş ve Teslimat
+                        </button>
+                    </h2>
+                    <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            <div class="mb-4">
+                                <h5>Siparişim ne zaman teslim edilir?</h5>
+                                <p>Siparişleriniz genellikle 1-3 iş günü içerisinde hazırlanır ve kargoya verilir. Teslimat süresi bulunduğunuz bölgeye göre 1-3 iş günü arasında değişmektedir.</p>
+                            </div>
+
+                            <div class="mb-4">
+                                <h5>Kargo takibini nasıl yapabilirim?</h5>
+                                <p>Siparişiniz kargoya verildikten sonra size e-posta ile bilgilendirme yapılacaktır. Ayrıca web sitemizin footer bölümündeki "Kargo Takip" linkinden siparişinizin durumunu takip edebilirsiniz.</p>
+                            </div>
+
+                            <div class="mb-4">
+                                <h5>Teslimat ücretleri ne kadardır?</h5>
+                                <p>150 TL ve üzeri alışverişlerinizde kargo ücretsizdir. 150 TL altındaki siparişlerde kargo ücreti 29.90 TL'dir.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ödeme -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                            Ödeme
+                        </button>
+                    </h2>
+                    <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            <div class="mb-4">
+                                <h5>Hangi ödeme yöntemlerini kullanabilirim?</h5>
+                                <p>Kredi kartı, banka kartı ve havale/EFT ile ödeme yapabilirsiniz. Tüm ödemeleriniz 256-bit SSL ile şifrelenerek güvenle gerçekleştirilmektedir.</p>
+                            </div>
+
+                            <div class="mb-4">
+                                <h5>Taksitli alışveriş yapabilir miyim?</h5>
+                                <p>Evet, anlaşmalı bankaların kredi kartları ile 2-12 taksit arasında taksitli alışveriş yapabilirsiniz. Taksit seçenekleri ürün ve banka bazında değişiklik gösterebilir.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- İade ve Değişim -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                            İade ve Değişim
+                        </button>
+                    </h2>
+                    <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            <div class="mb-4">
+                                <h5>İade sürecini nasıl başlatabilirim?</h5>
+                                <p>Ürünü teslim aldıktan sonra 14 gün içinde iade talebinde bulunabilirsiniz. İade işlemi için hesabınızdaki "Siparişlerim" sayfasından ilgili siparişi seçerek iade talebinde bulunabilirsiniz.</p>
+                            </div>
+
+                            <div class="mb-4">
+                                <h5>İade kargo ücreti kime ait?</h5>
+                                <p>Üründe herhangi bir kusur veya yanlış ürün gönderimi söz konusu ise kargo ücreti firmamıza aittir. Cayma hakkı kullanımında iade kargo ücreti müşteriye aittir.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Üyelik -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                            Üyelik
+                        </button>
+                    </h2>
+                    <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            <div class="mb-4">
+                                <h5>Üye olmadan alışveriş yapabilir miyim?</h5>
+                                <p>Hayır, güvenli alışveriş için üye olmanız gerekmektedir. Üyelik işlemi tamamen ücretsizdir ve sadece birkaç dakikanızı alacaktır.</p>
+                            </div>
+
+                            <div class="mb-4">
+                                <h5>Şifremi unuttum, ne yapmalıyım?</h5>
+                                <p>Giriş sayfasındaki "Şifremi Unuttum" linkine tıklayarak e-posta adresinize şifre sıfırlama bağlantısı gönderilmesini sağlayabilirsiniz.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <p class="text-muted">
+                    Burada yanıtını bulamadığınız sorularınız için <a href="@Url.Action("Contact", "Home")" class="text-primary">iletişim formu</a> 
+                    üzerinden bize ulaşabilirsiniz.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .accordion-button:not(.collapsed) {
+        background-color: #f8f9fa;
+        color: #0d6efd;
+    }
+
+    .accordion-button:focus {
+        box-shadow: none;
+        border-color: rgba(0,0,0,.125);
+    }
+
+    .accordion-item {
+        margin-bottom: 1rem;
+    }
+
+    .accordion-body {
+        background-color: #fff;
+    }
+
+    h5 {
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+</style> 
