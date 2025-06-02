@@ -113,7 +113,6 @@
 
         // Kart numarası kontrolü ve formatlaması
         document.getElementById('cardNumber').addEventListener('input', function (e) {
-            // Sadece rakamları tut ve 16 karakterle sınırla
             let value = e.target.value.replace(/\D/g, '').substring(0, 16);
             e.target.value = value;
         });
@@ -153,14 +152,11 @@
         $('#checkoutForm').on('submit', function(e) {
             e.preventDefault();
             
-            // Form validasyonunu kontrol et
             if (!$(this).valid()) {
-                console.log('Form validation failed');
                 var validationErrors = [];
                 $('.field-validation-error').each(function() {
                     validationErrors.push($(this).text());
                 });
-                console.log('Validation errors:', validationErrors);
                 
                 Swal.fire({
                     title: 'Hata!',
@@ -176,14 +172,12 @@
             submitButton.prop('disabled', true);
             
             const formData = $(this).serializeArray();
-            console.log('Sending form data:', formData);
             
             $.ajax({
                 url: $(this).attr('action'),
                 type: 'POST',
                 data: formData,
                 success: function(response) {
-                    console.log('Server response:', response);
                     if (response.success) {
                         Swal.fire({
                             title: 'Başarılı!',
@@ -195,25 +189,32 @@
                             window.location.href = '/';
                         });
                     } else {
-                        console.log('Server validation errors:', response.errors);
-                        let errorMessage = response.message;
-                        if (response.errors && response.errors.length > 0) {
-                            errorMessage = response.errors.join('<br>');
+                        if (response.redirectUrl) {
+                            Swal.fire({
+                                title: 'Kayıt Gerekli',
+                                text: response.message,
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonText: 'Kayıt Ol',
+                                cancelButtonText: 'İptal'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = response.redirectUrl;
+                                }
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Hata!',
+                                text: response.message || 'Lütfen tüm alanları doldurun.',
+                                icon: 'error',
+                                confirmButtonText: 'Tamam'
+                            });
                         }
-                        Swal.fire({
-                            title: 'Hata!',
-                            html: errorMessage || 'Lütfen tüm alanları doldurun.',
-                            icon: 'error',
-                            confirmButtonText: 'Tamam'
-                        });
                         submitButton.prop('disabled', false);
                     }
                 },
                 error: function(xhr, status, error) {
                     console.error('Form submit error:', error);
-                    console.error('Status:', status);
-                    console.error('Response:', xhr.responseText);
-                    
                     Swal.fire({
                         title: 'Hata!',
                         text: 'Sipariş işlemi sırasında bir hata oluştu.',

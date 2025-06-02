@@ -19,6 +19,7 @@ namespace marketimnet.wepUI.Controllers
         private readonly IAntiforgery _antiforgery;
         private readonly IHubContext<NotificationHub> _hubContext;
         private readonly IOrderService _orderService;
+        private readonly IUserService _userService;
         private const string CartSessionKey = "Cart";
         private const int CacheDurationMinutes = 30;
         private const int CacheEntrySize = 1; // Size in bytes for cache entries
@@ -29,7 +30,8 @@ namespace marketimnet.wepUI.Controllers
             ILogger<CartController> logger,
             IAntiforgery antiforgery,
             IHubContext<NotificationHub> hubContext,
-            IOrderService orderService)
+            IOrderService orderService,
+            IUserService userService)
         {
             _productService = productService;
             _cache = cache;
@@ -37,6 +39,7 @@ namespace marketimnet.wepUI.Controllers
             _antiforgery = antiforgery;
             _hubContext = hubContext;
             _orderService = orderService;
+            _userService = userService;
         }
 
         private List<CartItem> GetCartFromSession()
@@ -356,7 +359,17 @@ namespace marketimnet.wepUI.Controllers
             try
             {
                 _logger.LogInformation("Checkout işlemi başlatıldı");
-                _logger.LogInformation($"Gelen model: ShippingAddress={model.ShippingAddress}, CardHolderName={model.CardHolderName}");
+
+                // E-posta adresi kontrolü
+                var user = await _userService.GetByEmailAsync(model.Email);
+                if (user == null)
+                {
+                    return Json(new { 
+                        success = false, 
+                        message = "Bu e-posta adresiyle kayıtlı bir hesap bulunamadı. Lütfen önce kayıt olun.",
+                        redirectUrl = "/Account/Register"
+                    });
+                }
 
                 var cart = GetCartFromSession();
                 if (cart == null || !cart.Any())
