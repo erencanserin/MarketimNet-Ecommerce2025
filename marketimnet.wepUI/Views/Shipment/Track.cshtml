@@ -1,0 +1,255 @@
+@{
+    ViewData["Title"] = "Kargo Takip";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-truck me-2"></i>Kargo Takip</h4>
+                </div>
+                <div class="card-body">
+                    <form id="trackForm" class="mb-4">
+                        @Html.AntiForgeryToken()
+                        <div class="form-group">
+                            <label for="email" class="form-label">E-posta Adresiniz</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                <input type="email" class="form-control" id="email" name="email" required 
+                                       placeholder="örnek@email.com">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search me-2"></i>Sorgula
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div id="resultArea" style="display: none;">
+                        <h5 class="border-bottom pb-2 mb-3">Kargo Durumu</h5>
+                        <div id="ordersList"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            function showLoading() {
+                $('#trackForm button[type="submit"]')
+                    .prop('disabled', true)
+                    .html('<span class="spinner-border spinner-border-sm me-2"></span>Sorgulanıyor...');
+            }
+
+            function hideLoading() {
+                $('#trackForm button[type="submit"]')
+                    .prop('disabled', false)
+                    .html('<i class="fas fa-search me-2"></i>Sorgula');
+            }
+
+            $('#trackForm').on('submit', function(e) {
+                e.preventDefault();
+                showLoading();
+                
+                var email = $('#email').val();
+                console.log('Sorgu başlatılıyor:', email);
+                
+                $.ajax({
+                    url: '@Url.Action("Track", "Shipment")',
+                    type: 'POST',
+                    data: {
+                        email: email,
+                        __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function(response) {
+                        console.log('Sunucu yanıtı:', response);
+                        hideLoading();
+
+                        if (response.success && response.orders && response.orders.length > 0) {
+                            $('#resultArea').show();
+                            var ordersHtml = '';
+                            
+                            response.orders.forEach(function(order) {
+                                console.log('İşlenen sipariş:', order);
+                                var status = order.status || 'Beklemede';
+                                var statusClass = getStatusClass(status);
+                                var orderDate = new Date(order.orderDate).toLocaleDateString('tr-TR');
+                                var statusText = getStatusText(status);
+                                
+                                ordersHtml += `
+                                    <div class="card mb-3">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <h6 class="mb-1">Sipariş No: #${order.orderId}</h6>
+                                                    <p class="text-muted mb-1">Tarih: ${orderDate}</p>
+                                                    <p class="mb-0">Tutar: ${order.totalAmount.toFixed(2)} ₺</p>
+                                                </div>
+                                                <div class="text-end">
+                                                    <span class="badge ${statusClass} d-block mb-1">${statusText}</span>
+                                                    <small class="text-muted d-block">Son Güncelleme: ${orderDate}</small>
+                                                </div>
+                                            </div>
+                                            ${getStatusTimeline(status)}
+                                        </div>
+                                    </div>`;
+                            });
+                            
+                            $('#ordersList').html(ordersHtml);
+                        } else {
+                            $('#resultArea').hide();
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'Bilgi',
+                                text: response.message || 'Bu e-posta adresine ait kargoda sipariş bulunamadı.'
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Ajax hatası:', { xhr, status, error });
+                        hideLoading();
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Hata',
+                            text: 'İşlem sırasında bir hata oluştu. Lütfen daha sonra tekrar deneyiniz.'
+                        });
+                    }
+                });
+            });
+            
+            function getStatusClass(status) {
+                if (!status) return 'bg-secondary';
+                
+                switch(status.toLowerCase()) {
+                    case 'beklemede':
+                        return 'bg-warning';
+                    case 'onaylandı':
+                    case 'onaylandi':
+                        return 'bg-info';
+                    case 'hazırlanıyor':
+                    case 'hazirlaniyor':
+                        return 'bg-primary';
+                    case 'kargoya verildi':
+                        return 'bg-success';
+                    case 'tamamlandı':
+                    case 'tamamlandi':
+                        return 'bg-success';
+                    case 'iptal edildi':
+                        return 'bg-danger';
+                    default:
+                        return 'bg-secondary';
+                }
+            }
+
+            function getStatusText(status) {
+                if (!status) return 'Beklemede';
+                
+                switch(status.toLowerCase()) {
+                    case 'beklemede':
+                        return 'Beklemede';
+                    case 'onaylandı':
+                    case 'onaylandi':
+                        return 'Onaylandı';
+                    case 'hazırlanıyor':
+                    case 'hazirlaniyor':
+                        return 'Hazırlanıyor';
+                    case 'kargoya verildi':
+                        return 'Kargoya Verildi';
+                    case 'tamamlandı':
+                    case 'tamamlandi':
+                        return 'Tamamlandı';
+                    case 'iptal edildi':
+                        return 'İptal Edildi';
+                    default:
+                        return status;
+                }
+            }
+
+            function getStatusTimeline(currentStatus) {
+                if (!currentStatus) currentStatus = 'Beklemede';
+                
+                const statuses = [
+                    { key: 'beklemede', text: 'Sipariş Alındı' },
+                    { key: 'onaylandı', text: 'Onaylandı' },
+                    { key: 'hazırlanıyor', text: 'Hazırlanıyor' },
+                    { key: 'kargoya verildi', text: 'Kargoya Verildi' },
+                    { key: 'tamamlandı', text: 'Teslim Edildi' }
+                ];
+
+                let currentIndex = statuses.findIndex(s => 
+                    currentStatus.toLowerCase().includes(s.key.toLowerCase()));
+                if (currentIndex === -1) currentIndex = 0;
+
+                let timelineHtml = '<div class="timeline mt-3">';
+                statuses.forEach((status, index) => {
+                    const isActive = index <= currentIndex;
+                    timelineHtml += `
+                        <div class="timeline-item ${isActive ? 'active' : ''}">
+                            <div class="timeline-marker ${isActive ? 'bg-success' : 'bg-secondary'}"></div>
+                            <div class="timeline-content">
+                                <h6 class="mb-0">${status.text}</h6>
+                            </div>
+                        </div>`;
+                });
+                timelineHtml += '</div>';
+
+                return timelineHtml;
+            }
+        });
+    </script>
+
+    <style>
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+            margin-top: 20px;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 40px;
+            margin-bottom: 20px;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 9px;
+            top: 20px;
+            height: calc(100% + 10px);
+            width: 2px;
+            background-color: #dee2e6;
+        }
+
+        .timeline-item:last-child::before {
+            display: none;
+        }
+
+        .timeline-item.active .timeline-content {
+            color: #198754;
+            font-weight: bold;
+        }
+
+        .badge {
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+        }
+
+        .spinner-border {
+            width: 1rem;
+            height: 1rem;
+        }
+    </style>
+} 

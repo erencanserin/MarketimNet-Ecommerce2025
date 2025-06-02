@@ -3,14 +3,31 @@
 @if (Context.Session.GetString("UserId") != null)
 {
     <div class="d-flex">
-        <a class="btn btn-outline-primary me-2" href="/Account/Profile">
-            <i class="fas fa-user me-1"></i>Hesabım
-        </a>
-        <form method="post" action="/Account/Logout" class="d-inline">
-            <button type="submit" class="btn btn-outline-danger">
-                <i class="fas fa-sign-out-alt me-1"></i>Çıkış
+        <div class="dropdown me-2">
+            <button class="btn btn-outline-primary dropdown-toggle" type="button" id="userMenuDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-user me-1"></i>Hesabım
             </button>
-        </form>
+            <ul class="dropdown-menu" aria-labelledby="userMenuDropdown">
+                <li>
+                    <a class="dropdown-item" href="/Account/Profile">
+                        <i class="fas fa-user-circle me-2"></i>Profilim
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="/Order">
+                        <i class="fas fa-box me-2"></i>Siparişlerim
+                    </a>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <form method="post" action="/Account/Logout" class="d-inline">
+                        <button type="submit" class="dropdown-item text-danger">
+                            <i class="fas fa-sign-out-alt me-2"></i>Çıkış Yap
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
     </div>
 }
 else

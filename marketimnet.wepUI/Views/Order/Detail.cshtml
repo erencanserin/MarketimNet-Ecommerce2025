@@ -1,0 +1,178 @@
+@model marketimnet.Core.Entities.Order
+
+@{
+    ViewData["Title"] = "Sipariş Detayı";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <h2 class="mb-4">Sipariş Detayı #@Model.Id</h2>
+
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger">
+                    @TempData["Error"]
+                </div>
+            }
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Sipariş Bilgileri</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Sipariş Tarihi:</strong> @Model.OrderDate.ToString("dd.MM.yyyy HH:mm")</p>
+                            <p><strong>Durum:</strong> 
+                                @{
+                                    var statusClass = Model.Status.ToLower() switch
+                                    {
+                                        "beklemede" => "bg-warning",
+                                        "onaylandı" => "bg-info",
+                                        "hazırlanıyor" => "bg-primary",
+                                        "kargoya verildi" => "bg-success",
+                                        "tamamlandı" => "bg-success",
+                                        "iptal edildi" => "bg-danger",
+                                        _ => "bg-secondary"
+                                    };
+                                }
+                                <span class="badge @statusClass">@Model.Status</span>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Toplam Tutar:</strong> @Model.TotalAmount.ToString("N2") ₺</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Teslimat Bilgileri</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Ad Soyad:</strong> @Model.FullName</p>
+                    <p><strong>E-posta:</strong> @Model.Email</p>
+                    <p><strong>Telefon:</strong> @Model.Phone</p>
+                    <p><strong>Adres:</strong> @Model.Address</p>
+                    @if (!string.IsNullOrEmpty(Model.Note))
+                    {
+                        <p><strong>Not:</strong> @Model.Note</p>
+                    }
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Sipariş Ürünleri</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Ürün</th>
+                                    <th>Birim Fiyat</th>
+                                    <th>Adet</th>
+                                    <th>Toplam</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.OrderItems)
+                                {
+                                    <tr>
+                                        <td>@item.ProductName</td>
+                                        <td>@item.UnitPrice.ToString("N2") ₺</td>
+                                        <td>@item.Quantity</td>
+                                        <td>@item.TotalPrice.ToString("N2") ₺</td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>Toplam:</strong></td>
+                                    <td><strong>@Model.TotalAmount.ToString("N2") ₺</strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Sipariş Durumu</h5>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        @{
+                            var statuses = new[] { "Beklemede", "Onaylandı", "Hazırlanıyor", "Kargoya Verildi", "Tamamlandı" };
+                            var currentStatusIndex = Array.IndexOf(statuses, Model.Status);
+                            
+                            for (var i = 0; i < statuses.Length; i++)
+                            {
+                                var isActive = i <= currentStatusIndex;
+                                <div class="timeline-item @(isActive ? "active" : "")">
+                                    <div class="timeline-marker @(isActive ? "bg-success" : "bg-secondary")"></div>
+                                    <div class="timeline-content">
+                                        <h6 class="mb-0">@statuses[i]</h6>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a href="@Url.Action("Index")" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Siparişlerime Dön
+        </a>
+    </div>
+</div>
+
+<style>
+    .timeline {
+        position: relative;
+        padding: 20px 0;
+    }
+
+    .timeline-item {
+        position: relative;
+        padding-left: 40px;
+        margin-bottom: 20px;
+    }
+
+    .timeline-marker {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+    }
+
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: 9px;
+        top: 20px;
+        height: 100%;
+        width: 2px;
+        background-color: #dee2e6;
+    }
+
+    .timeline-item:last-child::before {
+        display: none;
+    }
+
+    .timeline-item.active .timeline-content {
+        color: #198754;
+        font-weight: bold;
+    }
+</style> 
