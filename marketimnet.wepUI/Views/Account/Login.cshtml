@@ -32,4 +32,25 @@
             </div>
         </div>
     </div>
-</div> 
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    
+    <script>
+        // Başarılı kayıt mesajını göster
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <text>
+            toastr.options = {
+                "closeButton": true,
+                "progressBar": true,
+                "positionClass": "toast-top-right",
+                "timeOut": "5000"
+            };
+            toastr.success('@TempData["SuccessMessage"]');
+            </text>
+        }
+    </script>
+} 

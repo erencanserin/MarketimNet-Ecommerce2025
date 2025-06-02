@@ -1,3 +1,4 @@
+@model RegisterViewModel
 @{
     ViewData["Title"] = "Kayıt Ol";
 }
@@ -8,40 +9,57 @@
             <div class="card shadow auth-card">
                 <div class="card-body p-5">
                     <h2 class="text-center mb-4">@ViewData["Title"]</h2>
-                    <form method="post">
+                    <form method="post" asp-action="Register">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                        
                         <div class="mb-3">
-                            <label for="firstName" class="form-label">Ad</label>
-                            <input type="text" class="form-control" id="firstName" name="firstName" required>
+                            <label asp-for="Name" class="form-label">Ad</label>
+                            <input asp-for="Name" class="form-control">
+                            <span asp-validation-for="Name" class="text-danger"></span>
                         </div>
+                        
                         <div class="mb-3">
-                            <label for="lastName" class="form-label">Soyad</label>
-                            <input type="text" class="form-control" id="lastName" name="lastName" required>
+                            <label asp-for="Surname" class="form-label">Soyad</label>
+                            <input asp-for="Surname" class="form-control">
+                            <span asp-validation-for="Surname" class="text-danger"></span>
                         </div>
+                        
                         <div class="mb-3">
-                            <label for="email" class="form-label">E-posta Adresi</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
+                            <label asp-for="Email" class="form-label">E-posta Adresi</label>
+                            <input asp-for="Email" class="form-control">
+                            <span asp-validation-for="Email" class="text-danger"></span>
                         </div>
+                        
                         <div class="mb-3">
-                            <label for="phone" class="form-label">Telefon Numarası</label>
-                            <input type="tel" class="form-control" id="phone" name="phone" pattern="[0-9]{11}" maxlength="11" placeholder="05xxxxxxxxx" required>
+                            <label asp-for="Phone" class="form-label">Telefon Numarası</label>
+                            <input asp-for="Phone" class="form-control" placeholder="05xxxxxxxxx">
+                            <span asp-validation-for="Phone" class="text-danger"></span>
                         </div>
+                        
                         <div class="mb-3">
-                            <label for="password" class="form-label">Şifre</label>
-                            <input type="password" class="form-control" id="password" name="password" required>
+                            <label asp-for="Password" class="form-label">Şifre</label>
+                            <input asp-for="Password" class="form-control">
+                            <span asp-validation-for="Password" class="text-danger"></span>
                         </div>
+                        
                         <div class="mb-3">
-                            <label for="confirmPassword" class="form-label">Şifre Tekrar</label>
-                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                            <label asp-for="RepeatPassword" class="form-label">Şifre Tekrar</label>
+                            <input asp-for="RepeatPassword" class="form-control">
+                            <span asp-validation-for="RepeatPassword" class="text-danger"></span>
                         </div>
+                        
                         <div class="mb-3 form-check">
                             <input type="checkbox" class="form-check-input" id="terms" name="terms" required>
                             <label class="form-check-label" for="terms">
                                 <a href="#" class="text-decoration-none">Kullanım şartlarını</a> kabul ediyorum
                             </label>
                         </div>
+                        
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary btn-lg">Kayıt Ol</button>
                         </div>
+                        
                         <div class="text-center mt-3">
                             <a href="/Account/Login" class="text-decoration-none">Zaten hesabınız var mı? Giriş yapın</a>
                         </div>
@@ -50,4 +68,18 @@
             </div>
         </div>
     </div>
-</div> 
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        // Telefon numarası formatlaması
+        $(document).ready(function() {
+            $('#Phone').on('input', function() {
+                var value = $(this).val().replace(/\D/g, '').substring(0, 11);
+                $(this).val(value);
+            });
+        });
+    </script>
+} 
