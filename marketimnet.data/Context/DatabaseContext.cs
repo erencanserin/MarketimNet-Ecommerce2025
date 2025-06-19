@@ -31,7 +31,7 @@ namespace marketimnet.Data
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer(@"Server=(localdb)\MSSQLLocalDB;Database=marketimnetDb;Trusted_Connection=True;TrustServerCertificate=True;",
+                optionsBuilder.UseSqlServer(@"Server=(localdb)\\MSSQLLocalDB;Database=marketimnetDb;Trusted_Connection=True;TrustServerCertificate=True;",
                     sqlOptions =>
                     {
                         sqlOptions.EnableRetryOnFailure(
@@ -78,10 +78,6 @@ namespace marketimnet.Data
                 .WithMany(c => c.Products)
                 .HasForeignKey(p => p.CategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<AppUser>()
-                .HasIndex(u => u.Email)
-                .IsUnique();
 
             modelBuilder.Entity<AppUser>()
                 .Property(u => u.Email)

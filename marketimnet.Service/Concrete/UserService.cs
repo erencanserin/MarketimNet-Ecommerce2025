@@ -37,11 +37,6 @@ namespace marketimnet.Service.Concrete
 
         public async Task<AppUser> AddAsync(AppUser user)
         {
-            if (await _context.AppUsers.AnyAsync(u => u.Email == user.Email))
-            {
-                throw new InvalidOperationException("Bu e-posta adresi zaten kullanılıyor.");
-            }
-
             user.CreatedDate = DateTime.Now;
             await _context.AppUsers.AddAsync(user);
             await _context.SaveChangesAsync();
